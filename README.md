@@ -1,1 +1,1 @@
-This is a proxy that takes S3 key and secret and signs requests upstream
+This is an initial stab at a radosgw admin api implementation.
