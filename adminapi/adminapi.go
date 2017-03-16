@@ -15,11 +15,20 @@ import (
 	"github.com/smartystreets/go-aws-auth"
 )
 
+var falsch bool = false
+
+// Use this type whenever you want to make an API call where a bool defaults to
+// true if omitted, and want it to actually be false.  In such cases, the struct
+// contains a reference to a bool versus a bool, since you cannot otherwise
+// differentiate false with unspecified.  This represents a reference to a
+// boolean false value.
+var FalseRef *bool = &falsch
+
 type AdminApi struct {
 	c     *http.Client
 	u     *url.URL
 	t     *http.Transport
-	creds *awsauth.Credentials // Embed that shit
+	creds *awsauth.Credentials
 }
 
 func NewAdminApi(cfg *Config) (*AdminApi, error) {
@@ -62,9 +71,40 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 }
 
 func (aa *AdminApi) Get(path string, queryStruct interface{}, responseBody interface{}) error {
+	return aa.Req("get", path, queryStruct, nil, responseBody)
+}
+
+func (aa *AdminApi) Delete(path string, queryStruct interface{}, responseBody interface{}) error {
+	return aa.Req("delete", path, queryStruct, nil, responseBody)
+}
+
+func (aa *AdminApi) Post(path string, requestBody interface{}, responseBody interface{}) error {
+	return aa.Req("post", path, nil, requestBody, responseBody)
+}
+
+func (aa *AdminApi) Put(path string, requestBody interface{}, responseBody interface{}) error {
+	return aa.Req("put", path, nil, requestBody, responseBody)
+}
+
+func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
-	s := sling.New().Client(aa.c).Get(url).QueryStruct(queryStruct)
+	s := sling.New().Client(aa.c).QueryStruct(queryStruct)
+	s.BodyJSON(requestBody)
+
+	switch verb {
+	case "get":
+		s = s.Get(url)
+	case "post":
+		s = s.Post(url)
+	case "put":
+		s = s.Put(url)
+	case "delete":
+		s = s.Delete(url)
+	default:
+		return fmt.Errorf("unsupported verb %s", verb)
+	}
+
 	req, err := s.Request()
 	if err != nil {
 		return err
@@ -78,9 +118,12 @@ func (aa *AdminApi) Get(path string, queryStruct interface{}, responseBody inter
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Invalid status code %d : %s", resp.StatusCode, resp.Status)
 	}
+	if responseBody == nil {
+		return nil
+	}
+
 	d := json.NewDecoder(resp.Body)
 	return d.Decode(responseBody)
-
 }
 
 type Config struct {

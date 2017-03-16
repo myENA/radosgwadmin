@@ -108,7 +108,8 @@ func (ph *ProxyHandler) HandleFunc(pattern string, handler http.HandlerFunc) {
 }
 
 func (ph *ProxyHandler) DoEverything(w http.ResponseWriter, req *http.Request) {
-	resp, err := ph.AdminApi.GetUsage(&adminapi.UsageRequest{})
+	// q := &adminapi.TrimUsageRequest{}
+	resp, err := ph.AdminApi.GetUserInfo("njohnson")
 	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 

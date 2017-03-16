@@ -25,7 +25,3 @@ func (rt RadosTime) MarshalText() ([]byte, error) {
 	b := make([]byte, 0, len(RadosTimeFormat))
 	return t.AppendFormat(b, RadosTimeFormat), nil
 }
-
-func (rt RadosTime) Time() time.Time {
-	return time.Time(rt)
-}

@@ -1,21 +1,32 @@
 package adminapi
 
 type UsageRequest struct {
-	Uid         string    `url:uid,omitempty`
-	Start       RadosTime `url:start,omitempty`
-	End         RadosTime `url:end,omitempty`
-	ShowEntries bool      `url:show-entries,omitempty`
-	ShowSummary bool      `url:show-summary,omitempty`
+	Uid         string    `url:"uid,omitempty"`
+	Start       RadosTime `url:"start,omitempty"`
+	End         RadosTime `url:"end,omitempty"`
+	ShowEntries bool      `url:"show-entries,omitempty"`
+	ShowSummary bool      `url:"show-summary,omitempty"`
+}
+
+type TrimUsageRequest struct {
+	Uid       string    `url:"uid,omitempty"`
+	Start     RadosTime `url:"start,omitempty"`
+	End       RadosTime `url:"end,omitempty"`
+	RemoveAll bool      `url:"remove-all,omitempty"`
+}
+
+
+
+func (aa *AdminApi) TrimUsage(treq *TrimUsageRequest) error {
+	err := aa.Delete("/usage", treq, nil)
+	return err
 }
 
 func (aa *AdminApi) GetUsage(ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
 	err := aa.Get("/usage", ureq, uresp)
-	if err != nil {
-		return uresp, err
-	}
-	return uresp, nil
+	return uresp, err
 }
 
 type UsageResponse struct {

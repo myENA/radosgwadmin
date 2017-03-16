@@ -1,0 +1,122 @@
+{
+   "entries" : [
+      {
+         "buckets" : [
+            {
+               "owner" : "njohnson",
+               "categories" : [
+                  {
+                     "bytes_sent" : 1178,
+                     "ops" : 4,
+                     "category" : "list_buckets",
+                     "bytes_received" : 0,
+                     "successful_ops" : 4
+                  }
+               ],
+               "bucket" : "",
+               "epoch" : 1489636800,
+               "time" : "2017-03-16 04:00:00.000000Z"
+            },
+            {
+               "epoch" : 1489636800,
+               "time" : "2017-03-16 04:00:00.000000Z",
+               "bucket" : "testfolder",
+               "categories" : [
+                  {
+                     "bytes_received" : 0,
+                     "category" : "create_bucket",
+                     "successful_ops" : 1,
+                     "ops" : 1,
+                     "bytes_sent" : 19
+                  },
+                  {
+                     "ops" : 2,
+                     "bytes_received" : 0,
+                     "category" : "get_bucket_versioning",
+                     "successful_ops" : 2,
+                     "bytes_sent" : 316
+                  },
+                  {
+                     "bytes_sent" : 1130,
+                     "bytes_received" : 0,
+                     "category" : "list_bucket",
+                     "successful_ops" : 3,
+                     "ops" : 3
+                  },
+                  {
+                     "bytes_sent" : 756,
+                     "category" : "list_bucket_multiparts",
+                     "bytes_received" : 0,
+                     "successful_ops" : 3,
+                     "ops" : 3
+                  },
+                  {
+                     "ops" : 1,
+                     "successful_ops" : 1,
+                     "bytes_received" : 6537591,
+                     "category" : "put_obj",
+                     "bytes_sent" : 0
+                  }
+               ],
+               "owner" : "njohnson"
+            }
+         ],
+         "user" : "njohnson"
+      }
+   ],
+   "summary" : [
+      {
+         "categories" : [
+            {
+               "bytes_sent" : 19,
+               "bytes_received" : 0,
+               "category" : "create_bucket",
+               "successful_ops" : 1,
+               "ops" : 1
+            },
+            {
+               "bytes_sent" : 316,
+               "category" : "get_bucket_versioning",
+               "bytes_received" : 0,
+               "successful_ops" : 2,
+               "ops" : 2
+            },
+            {
+               "bytes_sent" : 1130,
+               "successful_ops" : 3,
+               "bytes_received" : 0,
+               "category" : "list_bucket",
+               "ops" : 3
+            },
+            {
+               "ops" : 3,
+               "category" : "list_bucket_multiparts",
+               "bytes_received" : 0,
+               "successful_ops" : 3,
+               "bytes_sent" : 756
+            },
+            {
+               "ops" : 4,
+               "successful_ops" : 4,
+               "category" : "list_buckets",
+               "bytes_received" : 0,
+               "bytes_sent" : 1178
+            },
+            {
+               "successful_ops" : 1,
+               "category" : "put_obj",
+               "bytes_received" : 6537591,
+               "ops" : 1,
+               "bytes_sent" : 0
+            }
+         ],
+         "total" : {
+            "bytes_sent" : 3399,
+            "ops" : 14,
+            "successful_ops" : 14,
+            "bytes_received" : 6537591
+         },
+         "user" : "njohnson"
+      }
+   ]
+}
