@@ -1,0 +1,14 @@
+.settings/
+# Generic ignore stuff
+.vagrant/*
+*.komodoproject
+.DS_Store
+._*
+.svn
+.hg
+.*.swp
+.buildpath
+.project
+/.idea/
+buildtmp
+vendor/

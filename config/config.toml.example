@@ -1,0 +1,12 @@
+[server]
+    ServiceHost = "0.0.0.0"
+    ServicePort = 8080
+    Readtimeout = "120s"
+    WriteTimeout = "120s"
+
+[adminapi]
+    ClientTimeout = "120s"
+    ServerURL = "https://whatever.com"
+    AdminPath = "admin"
+    AccessKeyID = "blahblahblah"
+    SecretAccessKey = "yoursecretkeygoeshere"
