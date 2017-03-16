@@ -12,3 +12,4 @@
 /.idea/
 buildtmp
 vendor/
+proxy/proxy
