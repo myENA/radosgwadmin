@@ -15,8 +15,6 @@ type TrimUsageRequest struct {
 	RemoveAll bool      `url:"remove-all,omitempty"`
 }
 
-
-
 func (aa *AdminApi) TrimUsage(treq *TrimUsageRequest) error {
 	err := aa.Delete("/usage", treq, nil)
 	return err

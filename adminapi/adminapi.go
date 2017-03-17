@@ -15,7 +15,17 @@ import (
 	"github.com/smartystreets/go-aws-auth"
 )
 
+var tz *time.Location = nil
+
 var falsch bool = false
+
+func init() {
+	tz, _ = time.LoadLocation("Local") // Defaults to local
+}
+
+func SetTimezone(loc *time.Location) {
+	tz = loc
+}
 
 // Use this type whenever you want to make an API call where a bool defaults to
 // true if omitted, and want it to actually be false.  In such cases, the struct
@@ -67,6 +77,18 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 		Transport: aa.t,
 	}
 	aa.creds = &cfg.Credentials
+	if cfg.ZoneName != "" && tz.String() != cfg.ZoneName {
+		tz, err = time.LoadLocation(cfg.ZoneName)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if tz == nil {
+		fmt.Printf("tz is null??")
+	} else {
+		fmt.Printf("tz is: %s", tz.String())
+	}
 	return aa, nil
 }
 
@@ -131,6 +153,7 @@ type Config struct {
 	ServerURL        string
 	AdminPath        string
 	CACertBundlePath string
+	ZoneName         string
 	awsauth.Credentials
 }
 

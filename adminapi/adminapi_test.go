@@ -43,7 +43,7 @@ func (ms *ModelsSuite) SetupSuite() {
 
 }
 
-func (suite *ModelsSuite) TestUsage() {
+func (suite *ModelsSuite) Test01Usage() {
 	usagejson := suite.dbags["usage"]
 	resp := &UsageResponse{}
 	err := json.Unmarshal(usagejson, resp)
@@ -56,6 +56,15 @@ func (suite *ModelsSuite) TestUsage() {
 	suite.Len(resp.Summary, 1, "Expected summary size not found")
 	suite.Len(resp.Summary[0].Categories, 6, "Expected number of categories in the summary not found")
 
+}
+
+func (suite *ModelsSuite) Test02Bucket() {
+	bucketjson := suite.dbags["bucket"]
+	resp := &BucketResponse{}
+	err := json.Unmarshal(bucketjson, resp)
+	suite.NoError(err, "Error unmarshaling bucket json")
+	fmt.Printf("bucket response:\n%#v\n", resp)
+	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
 }
 
 func TestAdminApi(t *testing.T) {

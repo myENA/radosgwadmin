@@ -1,18 +1,23 @@
 package adminapi
 
 import (
-	"time"
 	"errors"
+	"time"
 )
 
 type RadosTime time.Time
 
 const RadosTimeFormat string = "2006-01-02 15:04:05.000000Z07:00"
 
+const RadosBucketTimeFormat string = "2006-01-02 15:04:05.000000"
+
 func (rt *RadosTime) UnmarshalText(text []byte) error {
 	var err error
 	t := (*time.Time)(rt)
 	*t, err = time.Parse(RadosTimeFormat, string(text))
+	if err != nil {
+		*t, err = time.ParseInLocation(RadosBucketTimeFormat, string(text), tz)
+	}
 	return err
 }
 

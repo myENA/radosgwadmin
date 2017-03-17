@@ -1,0 +1,6 @@
+[adminapi]
+    ClientTimeout = "120s"
+    ServerURL = "https://asdf.org/"
+    AdminPath = "admin"
+    AccessKeyID = "ABC123BLAHBLAHBLAH"
+    SecretAccessKey = "IMASUPERSECRETACCESSKEY"

@@ -1,0 +1,29 @@
+{
+   "marker" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.4",
+   "bucket_quota" : {
+      "max_size_kb" : -1,
+      "max_objects" : -1,
+      "enabled" : false
+   },
+   "mtime" : "2017-03-02 14:01:56.759776",
+   "ver" : "0#43309",
+   "max_marker" : "0#",
+   "pool" : "default.rgw.buckets.data",
+   "master_ver" : "0#0",
+   "id" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.4",
+   "usage" : {
+      "rgw.main" : {
+         "num_objects" : 21497,
+         "size_kb" : 1284072,
+         "size_kb_actual" : 1329580
+      },
+      "rgw.multimeta" : {
+         "size_kb" : 0,
+         "size_kb_actual" : 0,
+         "num_objects" : 0
+      }
+   },
+   "bucket" : "rclone",
+   "index_pool" : "default.rgw.buckets.index",
+   "owner" : "foouser"
+}
