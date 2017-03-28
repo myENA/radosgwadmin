@@ -45,7 +45,12 @@ func main() {
 		log.Fatalf("Could not parse URL: %s", cfg.AdminApi.ServerURL)
 	}
 
-	p := NewProxy(target, cfg)
+	aa, err := adminapi.NewAdminApi(cfg.AdminApi)
+	if err != nil {
+		log.Fatalf("Could not initialize admin api: %s", err)
+	}
+
+	p := NewProxy(target, cfg, aa.HttpClient().Transport)
 	http.HandleFunc("/", p.proxy.ServeHTTP)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Server.ServiceHost, cfg.Server.ServicePort), nil)
 
@@ -57,11 +62,12 @@ type Proxy struct {
 	cfg    *Config
 }
 
-func NewProxy(target *url.URL, cfg *Config) *Proxy {
+func NewProxy(target *url.URL, cfg *Config, transport http.RoundTripper) *Proxy {
 	p := new(Proxy)
 	p.target = target
 	p.cfg = cfg
 	p.proxy = new(httputil.ReverseProxy)
+	p.proxy.Transport = transport
 	p.proxy.Director = p.Director
 	return p
 }
@@ -79,6 +85,7 @@ func (p *Proxy) Director(req *http.Request) {
 	} else {
 		req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
 	}
+	req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
 }
 
 func singleJoiningSlash(a, b string) string {

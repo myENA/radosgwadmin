@@ -56,6 +56,11 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	aa.t = new(http.Transport)
+	tlsc := new(tls.Config)
+	tlsc.InsecureSkipVerify = cfg.InsecureSkipVerify
+
 	var cacert []byte
 	if cfg.CACertBundlePath != "" {
 		cacert, err = ioutil.ReadFile(cfg.CACertBundlePath)
@@ -63,9 +68,7 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 			return nil, fmt.Errorf("Cannot open ca cert bundle %s: %s", cfg.CACertBundlePath, err)
 		}
 	}
-	aa.t = &http.Transport{}
 
-	tlsc := new(tls.Config)
 	if len(cacert) != 0 {
 		bundle := x509.NewCertPool()
 		ok := bundle.AppendCertsFromPEM(cacert)
@@ -75,7 +78,7 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 		tlsc.RootCAs = bundle
 		tlsc.BuildNameToCertificate()
 	}
-	tlsc.InsecureSkipVerify = cfg.InsecureSkipVerify
+
 	aa.t.TLSClientConfig = tlsc
 	aa.c = &http.Client{
 		Timeout:   cfg.ClientTimeout.Duration,
@@ -176,4 +179,8 @@ func (d *Duration) UnmarshalText(text []byte) error {
 	var err error
 	d.Duration, err = time.ParseDuration(string(text))
 	return err
+}
+
+func (aa *AdminApi) HttpClient() *http.Client {
+	return aa.c
 }

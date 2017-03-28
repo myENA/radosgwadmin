@@ -12,3 +12,4 @@
     SecretAccessKey = "yoursecretkeygoeshere"
     CACertBundlePath = ""
     InsecureSkipVerify = false
+    ZoneName = "Local"
