@@ -1,32 +1,51 @@
 package adminapi
 
+import (
+	"strings"
+)
+
 type UserInfoRequest struct {
 	Uid string `url:"uid"`
 }
 
+type UserDeleteRequest UserInfoRequest
+
 type UserInfoResponse struct {
-	UserId      string             `json:"user_id"`
-	DisplayName string             `json:"display_name"`
-	Email       string             `json:"email"`
-	Suspended   int                `json:"suspended"` // should be bool
-	MaxBuckets  int                `json:"max_buckets"`
-	SubUsers    []SubUser          `json:"subusers"`
-	Keys        []UserKey          `json:"keys"`
-	SwiftKeys   []SwiftKey         `json:"swift_keys"`
-	Caps        []UserCapabilities `json:"caps"`
+	UserId      string     `json:"user_id"`
+	DisplayName string     `json:"display-name"`
+	Email       string     `json:"email"`
+	Suspended   int        `json:"suspended"` // should be bool
+	MaxBuckets  int        `json:"max_buckets"`
+	SubUsers    []SubUser  `json:"subusers"`
+	Keys        []UserKey  `json:"keys"`
+	SwiftKeys   []SwiftKey `json:"swift_keys"`
+	Caps        UserCaps   `json:"caps"`
 }
 
-type CreateUserRequest struct {
-	Uid         string `json:"uid"`
-	DisplayName string `json:"display-name"`
-	Email       string `json:"email,omitempty"`
-	KeyType     string `json:"key-type,omitempty" enum:"swift|s3|"`
-	AccessKey   string `json:"access-key,omitempty"`
-	SecretKey   string `json:"secret-key,omitempty"`
-	UserCaps    string `json:"user-caps"`
-	GenerateKey *bool  `json:"generate-key,omitempty"` // This defaults to true, preserving that behavior
-	MaxBuckets  int    `json:"max-buckets,omitempty"`
-	Suspended   bool   `json:"suspended,omitempty"`
+type UserCreateRequest struct {
+	Uid         string   `url:"uid"`
+	DisplayName string   `url:"display-name"`
+	Email       string   `url:"email,omitempty"`
+	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
+	AccessKey   string   `url:"access-key,omitempty"`
+	SecretKey   string   `url:"secret-key,omitempty"`
+	UserCaps    UserCaps `url:"user-caps,omitempty"`
+	GenerateKey *bool    `url:"generate-key,omitempty"` // This defaults to true, preserving that behavior
+	MaxBuckets  int      `url:"max-buckets,omitempty"`
+	Suspended   bool     `url:"suspended,omitempty"`
+}
+
+type UserModifyRequest struct {
+	Uid         string   `url:"uid"`
+	DisplayName string   `url:"display-name"`
+	Email       string   `url:"email,omitempty"`
+	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
+	AccessKey   string   `url:"access-key,omitempty"`
+	SecretKey   string   `url:"secret-key,omitempty"`
+	UserCaps    UserCaps `url:"user-caps"`
+	GenerateKey bool     `url:"generate-key,omitempty"` // This defaults to false, preserving that behavior
+	MaxBuckets  int      `url:"max-buckets,omitempty"`
+	Suspended   bool     `url:"suspended,omitempty"`
 }
 
 type SubUser struct {
@@ -45,15 +64,43 @@ type SwiftKey struct {
 	SecretKey string `json:"secret_key"`
 }
 
-type UserCapabilities struct {
+type UserCapability struct {
 	Type       string `json:"type"`
 	Permission string `json:"perm"`
 }
 
-func (aa *AdminApi) GetUserInfo(uid string) (*UserInfoResponse, error) {
+type UserCaps []UserCapability
+
+func (ucs UserCaps) MarshalText() ([]byte, error) {
+	sucs := ([]UserCapability)(ucs)
+	perms := make([]string, 0, len(sucs))
+	for _, uc := range sucs {
+		perms = append(perms, uc.Type+"="+uc.Permission)
+	}
+	return ([]byte)(strings.Join(perms, ";")), nil
+}
+
+func (aa *AdminApi) UserInfo(uid string) (*UserInfoResponse, error) {
 	uir := &UserInfoRequest{uid}
 	resp := &UserInfoResponse{}
 
 	err := aa.Get("/user", uir, resp)
+	return resp, err
+}
+
+func (aa *AdminApi) UserCreate(cur *UserCreateRequest) (*UserInfoResponse, error) {
+	resp := &UserInfoResponse{}
+	err := aa.Put("/user", cur, nil, resp)
+	return resp, err
+}
+
+func (aa *AdminApi) UserRm(uid string) error {
+	udr := &UserDeleteRequest{uid}
+	return aa.Delete("/user", udr, nil)
+}
+
+func (aa *AdminApi) UserUpdate(umr *UserModifyRequest) (*UserInfoResponse, error) {
+	resp := &UserInfoResponse{}
+	err := aa.Post("/user", umr, nil, resp)
 	return resp, err
 }

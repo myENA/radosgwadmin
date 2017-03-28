@@ -27,6 +27,12 @@ func SetTimezone(loc *time.Location) {
 	tz = loc
 }
 
+type FormatReq struct {
+	Format string `url:"format"`
+}
+
+var frj = &FormatReq{"json"}
+
 // Use this type whenever you want to make an API call where a bool defaults to
 // true if omitted, and want it to actually be false.  In such cases, the struct
 // contains a reference to a bool versus a bool, since you cannot otherwise
@@ -100,17 +106,18 @@ func (aa *AdminApi) Delete(path string, queryStruct interface{}, responseBody in
 	return aa.Req("delete", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) Post(path string, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req("post", path, nil, requestBody, responseBody)
+func (aa *AdminApi) Post(path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+	return aa.Req("post", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Put(path string, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req("put", path, nil, requestBody, responseBody)
+func (aa *AdminApi) Put(path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+	return aa.Req("put", path, queryStruct, requestBody, responseBody)
 }
 
 func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
+
 	s := sling.New().Client(aa.c).QueryStruct(queryStruct)
 	s.BodyJSON(requestBody)
 
@@ -132,13 +139,20 @@ func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody,
 		return err
 	}
 	signed := awsauth.Sign4(req, *aa.creds)
+
+	// This is to appease AWS signature algorithm.  spaces must
+	// be %20, go defaults to +
+	signed.URL.RawQuery = strings.Replace(signed.URL.RawQuery, "+", "%20", -1)
+
 	resp, err := aa.c.Do(signed)
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Invalid status code %d : %s", resp.StatusCode, resp.Status)
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("Invalid status code %d : %s : body: %s", resp.StatusCode, resp.Status, string(body))
 	}
 	if responseBody == nil {
 		return nil

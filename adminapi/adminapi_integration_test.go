@@ -57,16 +57,16 @@ func (is *IntegrationsSuite) SetupSuite() {
 		log.Fatalf("Got error opening config file: %s", err)
 	}
 
-//	is.randFilePath = datadir + "/10mbfile.bin"
-//	if _, err = os.Stat(is.randFilePath); os.IsNotExist(err) {
-//		f, err := os.Create(is.randFilePath)
-//		if err != nil {
-//			log.Fatalf("Cannot create file %s: %s", is.randFilePath, err)
-//		}
-//		r := rand.New(rand.NewSource(1))
-//		defer f.Close()
-//		_, err = io.CopyN(f, r, 10*1024*1024)
-//	}
+	//	is.randFilePath = datadir + "/10mbfile.bin"
+	//	if _, err = os.Stat(is.randFilePath); os.IsNotExist(err) {
+	//		f, err := os.Create(is.randFilePath)
+	//		if err != nil {
+	//			log.Fatalf("Cannot create file %s: %s", is.randFilePath, err)
+	//		}
+	//		r := rand.New(rand.NewSource(1))
+	//		defer f.Close()
+	//		_, err = io.CopyN(f, r, 10*1024*1024)
+	//	}
 
 	cfg := &IntegrationConfig{}
 	_, err = toml.Decode(string(cfgFile), cfg)
@@ -96,6 +96,17 @@ func (is *IntegrationsSuite) Test02Metadata() {
 	users, err := is.aa.MListUsers()
 	is.NoError(err, "Got error running MListUsers()")
 	log.Printf("users: %#v", users)
+}
+
+func (is *IntegrationsSuite) Test03User() {
+	ur := new(UserCreateRequest)
+	ur.Uid = "testuser"
+	ur.Email = "test.user@asdf.org"
+	ur.DisplayName = "Test User"
+	ur.UserCaps = nil
+	resp, err := is.aa.UserCreate(ur)
+	is.NoError(err, "Got error running UserCreate")
+	log.Printf("%#v", resp)
 }
 
 func TestIntegrations(t *testing.T) {
