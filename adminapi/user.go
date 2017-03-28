@@ -67,6 +67,7 @@ type UserCapability struct {
 
 type UserCaps []UserCapability
 
+// Implement Stringer
 func (uc UserCapability) String() string {
 	return uc.Type + "=" + uc.Permission
 }

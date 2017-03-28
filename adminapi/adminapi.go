@@ -114,12 +114,11 @@ func (aa *AdminApi) Put(path string, queryStruct, requestBody interface{}, respo
 	return aa.Req("put", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody, responseBody interface{}) error {
+func (aa *AdminApi) Req(verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
 
-	s := sling.New().Client(aa.c).QueryStruct(queryStruct)
-	s.BodyJSON(requestBody)
+	s := sling.New().Client(aa.c).QueryStruct(frj).QueryStruct(queryStruct).BodyJSON(requestBody)
 
 	switch verb {
 	case "get":
@@ -138,15 +137,15 @@ func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody,
 	if err != nil {
 		return err
 	}
-	signed := awsauth.Sign4(req, *aa.creds)
+	_ = awsauth.Sign4(req, *aa.creds)
 
 	// This is to appease AWS signature algorithm.  spaces must
 	// be %20, go defaults to +
-	signed.URL.RawQuery = strings.Replace(signed.URL.RawQuery, "+", "%20", -1)
+	req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
 
-	fmt.Printf("URL is: %#v\n", signed.URL)
+	fmt.Printf("URL is: %#v\n", req.URL)
 
-	resp, err := aa.c.Do(signed)
+	resp, err := aa.c.Do(req)
 	if err != nil {
 		return err
 	}
