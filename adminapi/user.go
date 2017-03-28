@@ -61,16 +61,16 @@ type SwiftKey struct {
 }
 
 type UserCapability struct {
-	Type       string `json:"type"`
-	Permission string `json:"perm"`
+	Type       string `json:"type" enum:"users|buckets|metadata|usage|zone"`
+	Permission string `json:"perm" enum:"*|read|write|read,write"`
 }
-
-type UserCaps []UserCapability
 
 // Implement Stringer
 func (uc UserCapability) String() string {
 	return uc.Type + "=" + uc.Permission
 }
+
+type UserCaps []UserCapability
 
 func (aa *AdminApi) UserInfo(uid string) (*UserInfoResponse, error) {
 	uir := &UserInfoRequest{uid}

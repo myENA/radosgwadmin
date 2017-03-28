@@ -137,11 +137,12 @@ func (aa *AdminApi) Req(verb, path string, queryStruct, requestBody, responseBod
 	if err != nil {
 		return err
 	}
+
+	_ = awsauth.Sign4(req, *aa.creds)
+
 	// This is to appease AWS signature algorithm.  spaces must
 	// be %20, go defaults to +
 	req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
-
-	_ = awsauth.Sign4(req, *aa.creds)
 
 	fmt.Printf("URL is: %#v\n", req.URL)
 
