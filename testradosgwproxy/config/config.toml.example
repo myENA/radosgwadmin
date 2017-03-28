@@ -10,3 +10,5 @@
     AdminPath = "admin"
     AccessKeyID = "blahblahblah"
     SecretAccessKey = "yoursecretkeygoeshere"
+    CACertBundlePath = ""
+    InsecureSkipVerify = false

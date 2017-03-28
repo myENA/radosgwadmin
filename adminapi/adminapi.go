@@ -56,27 +56,26 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 	if err != nil {
 		return nil, err
 	}
-	cacert := ""
+	var cacert []byte
 	if cfg.CACertBundlePath != "" {
-		bytes, err := ioutil.ReadFile(cfg.CACertBundlePath)
+		cacert, err = ioutil.ReadFile(cfg.CACertBundlePath)
 		if err != nil {
-			panic(fmt.Sprintf("Cannot open ca cert bundle %s: %s", cfg.CACertBundlePath, err))
+			return nil, fmt.Errorf("Cannot open ca cert bundle %s: %s", cfg.CACertBundlePath, err)
 		}
-		cacert = string(bytes)
 	}
 	aa.t = &http.Transport{}
 
-	var tlsc *tls.Config
-	if cacert != "" {
+	tlsc := new(tls.Config)
+	if len(cacert) != 0 {
 		bundle := x509.NewCertPool()
-		ok := bundle.AppendCertsFromPEM([]byte(cacert))
+		ok := bundle.AppendCertsFromPEM(cacert)
 		if !ok {
-			panic("Invalid cert bundle")
+			return nil, fmt.Errorf("Invalid cert bundle")
 		}
-		tlsc = new(tls.Config)
 		tlsc.RootCAs = bundle
 		tlsc.BuildNameToCertificate()
 	}
+	tlsc.InsecureSkipVerify = cfg.InsecureSkipVerify
 	aa.t.TLSClientConfig = tlsc
 	aa.c = &http.Client{
 		Timeout:   cfg.ClientTimeout.Duration,
@@ -90,11 +89,6 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 		return nil, err
 	}
 
-	if tz == nil {
-		fmt.Printf("tz is null??")
-	} else {
-		fmt.Printf("tz is: %s", tz.String())
-	}
 	return aa, nil
 }
 
@@ -165,11 +159,12 @@ func (aa *AdminApi) Req(verb, path string, queryStruct, requestBody, responseBod
 }
 
 type Config struct {
-	ClientTimeout    Duration
-	ServerURL        string
-	AdminPath        string
-	CACertBundlePath string
-	ZoneName         string
+	ClientTimeout      Duration
+	ServerURL          string
+	AdminPath          string
+	CACertBundlePath   string
+	InsecureSkipVerify bool
+	ZoneName           string
 	awsauth.Credentials
 }
 
