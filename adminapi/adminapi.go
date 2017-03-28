@@ -144,6 +144,8 @@ func (aa *AdminApi) Req(verb, path string, queryStruct interface{}, requestBody,
 	// be %20, go defaults to +
 	signed.URL.RawQuery = strings.Replace(signed.URL.RawQuery, "+", "%20", -1)
 
+	fmt.Printf("URL is: %#v\n", signed.URL)
+
 	resp, err := aa.c.Do(signed)
 	if err != nil {
 		return err

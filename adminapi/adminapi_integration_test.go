@@ -103,7 +103,7 @@ func (is *IntegrationsSuite) Test03User() {
 	ur.Uid = "testuser"
 	ur.Email = "test.user@asdf.org"
 	ur.DisplayName = "Test User"
-	ur.UserCaps = nil
+	ur.UserCaps = []UserCapability{UserCapability{"users","*"},UserCapability{"metadata","*"},UserCapability{"buckets","read"}}
 	resp, err := is.aa.UserCreate(ur)
 	is.NoError(err, "Got error running UserCreate")
 	log.Printf("%#v", resp)

@@ -1,9 +1,5 @@
 package adminapi
 
-import (
-	"strings"
-)
-
 type UserInfoRequest struct {
 	Uid string `url:"uid"`
 }
@@ -12,7 +8,7 @@ type UserDeleteRequest UserInfoRequest
 
 type UserInfoResponse struct {
 	UserId      string     `json:"user_id"`
-	DisplayName string     `json:"display-name"`
+	DisplayName string     `json:"display_name"`
 	Email       string     `json:"email"`
 	Suspended   int        `json:"suspended"` // should be bool
 	MaxBuckets  int        `json:"max_buckets"`
@@ -29,7 +25,7 @@ type UserCreateRequest struct {
 	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
 	AccessKey   string   `url:"access-key,omitempty"`
 	SecretKey   string   `url:"secret-key,omitempty"`
-	UserCaps    UserCaps `url:"user-caps,omitempty"`
+	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
 	GenerateKey *bool    `url:"generate-key,omitempty"` // This defaults to true, preserving that behavior
 	MaxBuckets  int      `url:"max-buckets,omitempty"`
 	Suspended   bool     `url:"suspended,omitempty"`
@@ -42,7 +38,7 @@ type UserModifyRequest struct {
 	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
 	AccessKey   string   `url:"access-key,omitempty"`
 	SecretKey   string   `url:"secret-key,omitempty"`
-	UserCaps    UserCaps `url:"user-caps"`
+	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
 	GenerateKey bool     `url:"generate-key,omitempty"` // This defaults to false, preserving that behavior
 	MaxBuckets  int      `url:"max-buckets,omitempty"`
 	Suspended   bool     `url:"suspended,omitempty"`
@@ -71,13 +67,8 @@ type UserCapability struct {
 
 type UserCaps []UserCapability
 
-func (ucs UserCaps) MarshalText() ([]byte, error) {
-	sucs := ([]UserCapability)(ucs)
-	perms := make([]string, 0, len(sucs))
-	for _, uc := range sucs {
-		perms = append(perms, uc.Type+"="+uc.Permission)
-	}
-	return ([]byte)(strings.Join(perms, ";")), nil
+func (uc UserCapability) String() string {
+	return uc.Type + "=" + uc.Permission
 }
 
 func (aa *AdminApi) UserInfo(uid string) (*UserInfoResponse, error) {
