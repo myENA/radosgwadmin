@@ -1,8 +1,8 @@
 hash: b0876dff2dfff946475384ead343e7884c00ba34feaee3f342844448658c933d
-updated: 2017-03-17T14:21:59.725889481-05:00
+updated: 2017-07-20T13:52:06.660931141-05:00
 imports:
 - name: github.com/BurntSushi/toml
-  version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
+  version: b26d9c308763d68093482582cea63d69be07a0f0
 - name: github.com/dghubble/sling
   version: eb56e89ac5088bebb12eef3cb4b293300f43608b
 - name: github.com/google/go-querystring
@@ -10,7 +10,7 @@ imports:
   subpackages:
   - query
 - name: github.com/smartystreets/go-aws-auth
-  version: 2043e6d0bb7e4c18464a7bba562acbe482e3cabd
+  version: 8ef1316913ee4f44bc48c2456e44a5c1c68ea53b
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
