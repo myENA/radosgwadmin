@@ -3,6 +3,7 @@
 package adminapi
 
 import (
+	"context"
 	"fmt"
 	// "io"
 	"io/ioutil"
@@ -87,13 +88,13 @@ func (is *IntegrationsSuite) TearDownSuite() {
 }
 
 func (is *IntegrationsSuite) Test01Usage() {
-	usage, err := is.aa.GetUsage(nil)
+	usage, err := is.aa.GetUsage(context.Background(), nil)
 	is.NoError(err, "Got error running GetUsage")
 	log.Printf("usage: %#v", usage)
 }
 
 func (is *IntegrationsSuite) Test02Metadata() {
-	users, err := is.aa.MListUsers()
+	users, err := is.aa.MListUsers(context.Background())
 	is.NoError(err, "Got error running MListUsers()")
 	log.Printf("users: %#v", users)
 }
@@ -104,7 +105,7 @@ func (is *IntegrationsSuite) Test03User() {
 	ur.Email = "test.user@asdf.org"
 	ur.DisplayName = "Test User"
 	ur.UserCaps = UserCaps{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
-	resp, err := is.aa.UserCreate(ur)
+	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
 	log.Printf("%#v", resp)
 }

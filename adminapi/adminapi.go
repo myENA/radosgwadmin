@@ -1,6 +1,7 @@
 package adminapi
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -95,23 +96,24 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 	return aa, nil
 }
 
-func (aa *AdminApi) Get(path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req("get", path, queryStruct, nil, responseBody)
+func (aa *AdminApi) Get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+	return aa.Req(ctx, "get", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) Delete(path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req("delete", path, queryStruct, nil, responseBody)
+func (aa *AdminApi) Delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+	return aa.Req(ctx, "delete", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) Post(path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req("post", path, queryStruct, requestBody, responseBody)
+func (aa *AdminApi) Post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+
+	return aa.Req(ctx, "post", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Put(path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req("put", path, queryStruct, requestBody, responseBody)
+func (aa *AdminApi) Put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+	return aa.Req(ctx, "put", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Req(verb, path string, queryStruct, requestBody, responseBody interface{}) error {
+func (aa *AdminApi) Req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
 
@@ -134,6 +136,8 @@ func (aa *AdminApi) Req(verb, path string, queryStruct, requestBody, responseBod
 	if err != nil {
 		return err
 	}
+
+	req.WithContext(ctx)
 
 	_ = awsauth.Sign4(req, *aa.creds)
 

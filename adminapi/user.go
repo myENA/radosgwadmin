@@ -1,5 +1,9 @@
 package adminapi
 
+import (
+	"context"
+)
+
 type UserInfoRequest struct {
 	Uid string `url:"uid"`
 }
@@ -72,27 +76,27 @@ func (uc UserCapability) String() string {
 
 type UserCaps []UserCapability
 
-func (aa *AdminApi) UserInfo(uid string) (*UserInfoResponse, error) {
+func (aa *AdminApi) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
 	uir := &UserInfoRequest{uid}
 	resp := &UserInfoResponse{}
 
-	err := aa.Get("/user", uir, resp)
+	err := aa.Get(ctx, "/user", uir, resp)
 	return resp, err
 }
 
-func (aa *AdminApi) UserCreate(cur *UserCreateRequest) (*UserInfoResponse, error) {
+func (aa *AdminApi) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.Put("/user", cur, nil, resp)
+	err := aa.Put(ctx, "/user", cur, nil, resp)
 	return resp, err
 }
 
-func (aa *AdminApi) UserRm(uid string) error {
+func (aa *AdminApi) UserRm(ctx context.Context, uid string) error {
 	udr := &UserDeleteRequest{uid}
-	return aa.Delete("/user", udr, nil)
+	return aa.Delete(ctx, "/user", udr, nil)
 }
 
-func (aa *AdminApi) UserUpdate(umr *UserModifyRequest) (*UserInfoResponse, error) {
+func (aa *AdminApi) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.Post("/user", umr, nil, resp)
+	err := aa.Post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }

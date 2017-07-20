@@ -1,5 +1,9 @@
 package adminapi
 
+import(
+	"context"
+)
+
 type UsageRequest struct {
 	Uid         string    `url:"uid,omitempty"`
 	Start       RadosTime `url:"start,omitempty"`
@@ -15,15 +19,15 @@ type TrimUsageRequest struct {
 	RemoveAll bool      `url:"remove-all,omitempty"`
 }
 
-func (aa *AdminApi) TrimUsage(treq *TrimUsageRequest) error {
-	err := aa.Delete("/usage", treq, nil)
+func (aa *AdminApi) TrimUsage(ctx context.Context, treq *TrimUsageRequest) error {
+	err := aa.Delete(ctx, "/usage", treq, nil)
 	return err
 }
 
-func (aa *AdminApi) GetUsage(ureq *UsageRequest) (*UsageResponse, error) {
+func (aa *AdminApi) GetUsage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
-	err := aa.Get("/usage", ureq, uresp)
+	err := aa.Get(ctx, "/usage", ureq, uresp)
 	return uresp, err
 }
 
