@@ -78,7 +78,8 @@ func (p *Proxy) Director(req *http.Request) {
 	req.URL.Scheme = target.Scheme
 	req.URL.Host = p.target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-	_ = awsauth.Sign4(req, p.cfg.AdminApi.Credentials)
+	// _ = awsauth.Sign4(req, p.cfg.AdminApi.Credentials)
+	_ = awsauth.SignS3(req, p.cfg.AdminApi.Credentials)
 	req.Header.Set("Host", target.Host)
 	if targetQuery == "" || req.URL.RawQuery == "" {
 		req.URL.RawQuery = targetQuery + req.URL.RawQuery

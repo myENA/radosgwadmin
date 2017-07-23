@@ -67,6 +67,24 @@ func (suite *ModelsSuite) Test02Bucket() {
 	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
 }
 
+func (suite *ModelsSuite) Test03Metadata() {
+	bucketjson := suite.dbags["mbucket"]
+	bresp := &MBucketResponse{}
+	err := json.Unmarshal(bucketjson, bresp)
+	suite.NoError(err, "Error unmarshaling mbucket json")
+	fmt.Printf("mbucket response:\n%#v\n", bresp)
+	userjson := suite.dbags["muser"]
+	uresp := &MUserResponse{}
+	err = json.Unmarshal(userjson, uresp)
+	suite.NoError(err, "Error unmarshaling muser json")
+	fmt.Printf("muser response:\n%#v\n", uresp)
+	bucketinstjson := suite.dbags["mbucketinstance"]
+	biresp := &MBucketInstanceResponse{}
+	err = json.Unmarshal(bucketinstjson, biresp)
+	suite.NoError(err, "Error unmarshaling mbucketinst json")
+	fmt.Printf("mbucket response:\n%#v\n", biresp)
+}
+
 func TestAdminApi(t *testing.T) {
 	suite.Run(t, new(ModelsSuite))
 }

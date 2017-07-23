@@ -1,0 +1,53 @@
+{
+   "data" : {
+      "bucket_info" : {
+         "bucket" : {
+            "marker" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.4",
+            "name" : "rclone",
+            "data_extra_pool" : "default.rgw.buckets.non-ec",
+            "bucket_id" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.4",
+            "pool" : "default.rgw.buckets.data",
+            "index_pool" : "default.rgw.buckets.index",
+            "tenant" : ""
+         },
+         "num_shards" : 0,
+         "placement_rule" : "default-placement",
+         "swift_ver_location" : "",
+         "flags" : 0,
+         "has_website" : "false",
+         "quota" : {
+            "enabled" : false,
+            "max_size_kb" : -1,
+            "max_objects" : -1
+         },
+         "swift_versioning" : "false",
+         "owner" : "dmabry",
+         "requester_pays" : "false",
+         "index_type" : 0,
+         "bi_shard_hash_type" : 0,
+         "has_instance_obj" : "true",
+         "creation_time" : "0.000000",
+         "zonegroup" : "5dbd54e0-87ab-49f1-b772-d07bbb23562d"
+      },
+      "attrs" : [
+         {
+            "key" : "user.rgw.acl",
+            "val" : "AgLDAAAAAwIZAAAABgAAAGRtYWJyeQsAAABEYXZpZCBNYWJyeQMDngAAAAEBAAAABgAAAGRtYWJyeQ8AAAACAAAAAAAAAAQDKAAAAAICBAAAAAIAAAAAAAAAAAAAAAAAAAACAgQAAAABAAAAAAAAAAEAAAAGAAAAZG1hYnJ5BAM5AAAAAgIEAAAAAAAAAAYAAABkbWFicnkAAAAAAAAAAAICBAAAAA8AAAALAAAARGF2aWQgTWFicnkAAAAAAQAAAAEAAAABAAAA"
+         },
+         {
+            "key" : "user.rgw.idtag",
+            "val" : ""
+         },
+         {
+            "key" : "user.rgw.manifest",
+            "val" : ""
+         }
+      ]
+   },
+   "ver" : {
+      "tag" : "_kW4ywnp4ab6nD0rpPta9Oek",
+      "ver" : 1
+   },
+   "key" : "bucket.instance:rclone:02c47c31-98a8-481c-869f-039e6b36abce.13198864.4",
+   "mtime" : "2017-03-02 20:01:56.759776Z"
+}

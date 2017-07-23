@@ -1,0 +1,81 @@
+{
+   "key" : "user:njohnson",
+   "mtime" : "2017-03-14 18:08:48.684444Z",
+   "data" : {
+      "display_name" : "Nathan Johnson",
+      "swift_keys" : [
+         {
+            "secret_key" : "1TD04b2p86pNnNDArBOBEFI5fJZzgBwaGklheRna",
+            "user" : "njohnson:swift"
+         }
+      ],
+      "auid" : 0,
+      "email" : "",
+      "user_quota" : {
+         "max_size_kb" : -1,
+         "max_objects" : -1,
+         "enabled" : false
+      },
+      "temp_url_keys" : [],
+      "bucket_quota" : {
+         "max_size_kb" : -1,
+         "enabled" : false,
+         "max_objects" : -1
+      },
+      "subusers" : [
+         {
+            "permissions" : "full-control",
+            "id" : "njohnson:swift"
+         }
+      ],
+      "attrs" : [
+         {
+            "key" : "user.rgw.idtag",
+            "val" : ""
+         },
+         {
+            "val" : "",
+            "key" : "user.rgw.manifest"
+         }
+      ],
+      "default_placement" : "",
+      "keys" : [
+         {
+            "user" : "njohnson",
+            "secret_key" : "82zwiWnRLOmdh22rIQQ0CNyeFqb1Dy3SXcthBVtm",
+            "access_key" : "PXZKL6DZZ58UCA6M3SR7"
+         }
+      ],
+      "max_buckets" : 1000,
+      "suspended" : 0,
+      "op_mask" : "read, write, delete",
+      "user_id" : "njohnson",
+      "placement_tags" : [],
+      "caps" : [
+         {
+            "perm" : "*",
+            "type" : "buckets"
+         },
+         {
+            "perm" : "*",
+            "type" : "metadata"
+         },
+         {
+            "type" : "usage",
+            "perm" : "*"
+         },
+         {
+            "perm" : "*",
+            "type" : "users"
+         },
+         {
+            "perm" : "*",
+            "type" : "zone"
+         }
+      ]
+   },
+   "ver" : {
+      "ver" : 7,
+      "tag" : "_wjO526Ygh5dvSctp04NdjaE"
+   }
+}

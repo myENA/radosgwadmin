@@ -1,0 +1,23 @@
+{
+   "mtime" : "2017-03-02 17:42:30.183709Z",
+   "data" : {
+      "bucket" : {
+         "name" : "stuff",
+         "marker" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.2",
+         "bucket_id" : "02c47c31-98a8-481c-869f-039e6b36abce.13198864.2",
+         "index_pool" : "default.rgw.buckets.index",
+         "tenant" : "",
+         "data_extra_pool" : "default.rgw.buckets.non-ec",
+         "pool" : "default.rgw.buckets.data"
+      },
+      "has_bucket_info" : "false",
+      "linked" : "true",
+      "creation_time" : "0.000000",
+      "owner" : "dmabry"
+   },
+   "key" : "bucket:stuff",
+   "ver" : {
+      "tag" : "_C3iYM4CEIKqTeUi2SJyXRMw",
+      "ver" : 1
+   }
+}
