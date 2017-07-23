@@ -28,7 +28,7 @@ type MBucketInstanceResponse struct {
 			Flags             int         `json:"flags"`
 			HasWebsite        string      `json:"has_website"` // bad bool
 			Quota             BucketQuota `json:"quota"`
-			SwiftVersioning   string        `json:"swift_versioning"`
+			SwiftVersioning   string      `json:"swift_versioning"`
 			Owner             string      `json:"owner"`
 			RequesterPays     string      `json:"requester_pays"`
 			IndexType         int         `json:"index_type"`
