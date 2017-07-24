@@ -60,12 +60,19 @@ type Proxy struct {
 	target *url.URL
 	proxy  *httputil.ReverseProxy
 	cfg    *Config
+	creds  awsauth.Credentials
 }
 
 func NewProxy(target *url.URL, cfg *Config, transport http.RoundTripper) *Proxy {
 	p := new(Proxy)
 	p.target = target
 	p.cfg = cfg
+	p.creds = awsauth.Credentials{
+		AccessKeyID:     cfg.AdminAPI.AccessKeyID,
+		SecretAccessKey: cfg.AdminAPI.SecretAccessKey,
+		SecurityToken:   cfg.AdminAPI.SecurityToken,
+		Expiration:      cfg.AdminAPI.Expiration,
+	}
 	p.proxy = new(httputil.ReverseProxy)
 	p.proxy.Transport = transport
 	p.proxy.Director = p.Director
@@ -79,7 +86,7 @@ func (p *Proxy) Director(req *http.Request) {
 	req.URL.Host = p.target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
 	// _ = awsauth.Sign4(req, p.cfg.AdminAPI.Credentials)
-	_ = awsauth.SignS3(req, p.cfg.AdminAPI.Credentials)
+	_ = awsauth.SignS3(req, p.creds)
 	req.Header.Set("Host", target.Host)
 	if targetQuery == "" || req.URL.RawQuery == "" {
 		req.URL.RawQuery = targetQuery + req.URL.RawQuery

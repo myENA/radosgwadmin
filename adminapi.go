@@ -26,7 +26,9 @@ func init() {
 	tz, _ = time.LoadLocation("Local") // Defaults to local
 }
 
-// SetTimeZone - override time zone
+// SetTimeZone - override time zone.  Not thread-safe, do
+// this at initialization time or protect it with a mutex
+// if necessary.
 func SetTimeZone(loc *time.Location) {
 	tz = loc
 }
@@ -84,7 +86,13 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 		Timeout:   cfg.ClientTimeout.Duration,
 		Transport: aa.t,
 	}
-	aa.creds = &cfg.Credentials
+	aa.creds = &awsauth.Credentials{
+		AccessKeyID:     cfg.AccessKeyID,
+		SecretAccessKey: cfg.SecretAccessKey,
+		SecurityToken:   cfg.SecurityToken,
+		Expiration:      cfg.Expiration,
+	}
+
 	if cfg.ZoneName != "" && tz.String() != cfg.ZoneName {
 		tz, err = time.LoadLocation(cfg.ZoneName)
 	}
@@ -143,7 +151,7 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 		return err
 	}
 
-	req.WithContext(ctx)
+	req = req.WithContext(ctx)
 	req.URL.Query().Set("format", "json")
 
 	_ = awsauth.SignS3(req, *aa.creds)
@@ -170,7 +178,10 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 	return d.Decode(responseBody)
 }
 
-// Config - this configures an AdminAPI
+// Config - this configures an AdminAPI.
+//
+// Specify CACertBundlePath only if you want to override the system default
+// CA cert bundle.
 type Config struct {
 	ClientTimeout      Duration
 	ServerURL          string
@@ -178,11 +189,16 @@ type Config struct {
 	CACertBundlePath   string
 	InsecureSkipVerify bool
 	ZoneName           string
-	awsauth.Credentials
+	AccessKeyID        string
+	SecretAccessKey    string
+	SecurityToken      string
+	Expiration         time.Time
 }
 
 // Duration - this allows us to use a text representation
-// of a duration and have it parse correctly.
+// of a duration and have it parse correctly.  Used for
+// BurntSushi toml decoder, since they didn't see fit to
+// handle built-in time.Duration type for some reason.
 type Duration struct {
 	time.Duration
 }

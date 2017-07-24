@@ -26,7 +26,7 @@ func (rt *RadosTime) UnmarshalText(text []byte) error {
 	return err
 }
 
-// MarshalText - implements TextUnmarshaler
+// MarshalText - implements TextMarshaler
 func (rt RadosTime) MarshalText() ([]byte, error) {
 	t := time.Time(rt)
 	if y := t.Year(); y < 0 || y >= 10000 {
