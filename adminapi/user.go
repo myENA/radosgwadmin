@@ -4,14 +4,15 @@ import (
 	"context"
 )
 
-type UserInfoRequest struct {
+type userInfoRequest struct {
 	UID string `url:"uid"`
 }
 
-type UserDeleteRequest UserInfoRequest
+type userDeleteRequest userInfoRequest
 
+// UserInfoResponse - respone from a user info request.
 type UserInfoResponse struct {
-	UserId      string     `json:"user_id"`
+	UserID      string     `json:"user_id"`
 	DisplayName string     `json:"display_name"`
 	Email       string     `json:"email"`
 	Suspended   int        `json:"suspended"` // should be bool
@@ -22,6 +23,7 @@ type UserInfoResponse struct {
 	Caps        UserCaps   `json:"caps"`
 }
 
+// UserCreateRequest - describes what to do in a user create operation.
 type UserCreateRequest struct {
 	UID         string   `url:"uid"`
 	DisplayName string   `url:"display-name"`
@@ -35,6 +37,7 @@ type UserCreateRequest struct {
 	Suspended   bool     `url:"suspended,omitempty"`
 }
 
+// UserModifyRequest - modify user request type.
 type UserModifyRequest struct {
 	UID         string   `url:"uid"`
 	DisplayName string   `url:"display-name"`
@@ -48,22 +51,26 @@ type UserModifyRequest struct {
 	Suspended   bool     `url:"suspended,omitempty"`
 }
 
+// SubUser - describes a subuser
 type SubUser struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	Permissions string `json:"permissions"`
 }
 
+// UserKey - user key information.
 type UserKey struct {
 	User      string `json:"user"`
 	AccessKey string `json:"access_key"`
 	SecretKey string `json:"secret_key"`
 }
 
+// SwiftKey - swift key information
 type SwiftKey struct {
 	User      string `json:"user"`
 	SecretKey string `json:"secret_key"`
 }
 
+// UserCapability - desribes user capabilities / permissions.
 type UserCapability struct {
 	Type       string `json:"type" enum:"users|buckets|metadata|usage|zone"`
 	Permission string `json:"perm" enum:"*|read|write|read,write"`
@@ -74,6 +81,7 @@ func (uc UserCapability) String() string {
 	return uc.Type + "=" + uc.Permission
 }
 
+// SubUserCreateRequest - Create sub user request.
 type SubUserCreateRequest struct {
 	UID            string `url:"uid"`
 	SubUser        string `url:"subuser"`
@@ -83,33 +91,39 @@ type SubUserCreateRequest struct {
 	GenerateSecret bool   `url:"generate-secret,omitempty"`
 }
 
+// UserCaps - list of UserCapability
 type UserCaps []UserCapability
 
+// UserInfo - get user information about uid.
 func (aa *AdminAPI) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
-	uir := &UserInfoRequest{uid}
+	uir := &userInfoRequest{uid}
 	resp := &UserInfoResponse{}
 
 	err := aa.get(ctx, "/user", uir, resp)
 	return resp, err
 }
 
+// UserCreate - create a user described by cur.
 func (aa *AdminAPI) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.put(ctx, "/user", cur, nil, resp)
 	return resp, err
 }
 
+// UserRm - delete user uid
 func (aa *AdminAPI) UserRm(ctx context.Context, uid string) error {
-	udr := &UserDeleteRequest{uid}
+	udr := &userDeleteRequest{uid}
 	return aa.delete(ctx, "/user", udr, nil)
 }
 
+// UserUpdate - update a user described by umr
 func (aa *AdminAPI) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }
 
+// SubUserCreate - create a subuser
 func (aa *AdminAPI) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
 	resp := []SubUser{}
 	err := aa.put(ctx, "/user?subuser", sucr, nil, &resp)

@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// UsageRequest - desribes a usage request
 type UsageRequest struct {
 	UID         string    `url:"uid,omitempty"`
 	Start       RadosTime `url:"start,omitempty"`
@@ -12,6 +13,7 @@ type UsageRequest struct {
 	ShowSummary bool      `url:"show-summary,omitempty"`
 }
 
+// TrimUsageRequest - describes a trim usage request
 type TrimUsageRequest struct {
 	UID       string    `url:"uid,omitempty"`
 	Start     RadosTime `url:"start,omitempty"`
@@ -19,11 +21,13 @@ type TrimUsageRequest struct {
 	RemoveAll bool      `url:"remove-all,omitempty"`
 }
 
+// TrimUsage - trim usage data
 func (aa *AdminAPI) TrimUsage(ctx context.Context, treq *TrimUsageRequest) error {
 	err := aa.delete(ctx, "/usage", treq, nil)
 	return err
 }
 
+// GetUsage - Get usage data.
 func (aa *AdminAPI) GetUsage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
@@ -31,21 +35,25 @@ func (aa *AdminAPI) GetUsage(ctx context.Context, ureq *UsageRequest) (*UsageRes
 	return uresp, err
 }
 
+// UsageResponse - response from a GetUsage()
 type UsageResponse struct {
 	Entries []UsageEntry   `json:"entries"`
 	Summary []UsageSummary `json:"summary"`
 }
 
+// UsageEntry - usage entry.
 type UsageEntry struct {
 	Buckets []UsageBucket `json:"buckets"`
 	User    string        `json:"user"`
 }
 
+// UsageSummary - usage summary info.
 type UsageSummary struct {
 	Categories []UsageCategory `json:"categories"`
 	Total      *UsageTotal     `json:"total"`
 }
 
+// UsageBucket - bucket usage metadata
 type UsageBucket struct {
 	Bucket     string          `json:"bucket"`
 	Owner      string          `json:"owner"`
@@ -54,6 +62,7 @@ type UsageBucket struct {
 	Time       RadosTime       `json:"time"`
 }
 
+// UsageCategory - usage by category.
 type UsageCategory struct {
 	BytesSent     int    `json:"bytes_sent"`
 	BytesReceived int    `json:"bytes_received"`
@@ -62,6 +71,7 @@ type UsageCategory struct {
 	Category      string `json:"category"`
 }
 
+// UsageTotal - overall usage totals
 type UsageTotal struct {
 	BytesSent     int `json:"bytes_sent"`
 	BytesReceived int `json:"bytes_received"`
