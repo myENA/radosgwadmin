@@ -74,6 +74,15 @@ func (uc UserCapability) String() string {
 	return uc.Type + "=" + uc.Permission
 }
 
+type SubUserCreateRequest struct {
+	UID            string `url:"uid"`
+	SubUser        string `url:"subuser"`
+	SecretKey      string `url:"secret-key,omitempty"`
+	KeyType        string `url:"key-type,omitempty"`
+	Access         string `url:"access,omitempty"`
+	GenerateSecret bool   `url:"generate-secret,omitempty"`
+}
+
 type UserCaps []UserCapability
 
 func (aa *AdminApi) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
@@ -98,5 +107,11 @@ func (aa *AdminApi) UserRm(ctx context.Context, uid string) error {
 func (aa *AdminApi) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.Post(ctx, "/user", umr, nil, resp)
+	return resp, err
+}
+
+func (aa *AdminApi) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
+	resp := []SubUser{}
+	err := aa.Put(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err
 }

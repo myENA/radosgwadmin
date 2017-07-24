@@ -108,6 +108,15 @@ func (is *IntegrationsSuite) Test03User() {
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
 	log.Printf("%#v", resp)
+	sur := new(SubUserCreateRequest)
+	sur.UID = "testuser"
+	sur.Access = "full"
+	sur.KeyType = "s3"
+	sur.SubUser = "testsubuser"
+	sur.GenerateSecret = true
+	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
+	is.NoError(err)
+	log.Printf("#v", nresp)
 }
 
 func TestIntegrations(t *testing.T) {

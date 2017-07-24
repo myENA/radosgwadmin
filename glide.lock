@@ -1,10 +1,8 @@
-hash: b0876dff2dfff946475384ead343e7884c00ba34feaee3f342844448658c933d
-updated: 2017-07-20T13:52:06.660931141-05:00
+hash: 6d0442139b6a9f5340d025cb930a188a24f035dff69765f9cc87ed1ce575af40
+updated: 2017-07-23T21:15:12.337873768-05:00
 imports:
 - name: github.com/BurntSushi/toml
   version: b26d9c308763d68093482582cea63d69be07a0f0
-- name: github.com/dghubble/sling
-  version: eb56e89ac5088bebb12eef3cb4b293300f43608b
 - name: github.com/google/go-querystring
   version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
   subpackages:

@@ -1,18 +1,20 @@
 package adminapi
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/dghubble/sling"
+	"github.com/google/go-querystring/query"
 	"github.com/smartystreets/go-aws-auth"
 )
 
@@ -97,55 +99,63 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 }
 
 func (aa *AdminApi) Get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "get", path, queryStruct, nil, responseBody)
+	return aa.Req(ctx, "GET", path, queryStruct, nil, responseBody)
 }
 
 func (aa *AdminApi) Delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "delete", path, queryStruct, nil, responseBody)
+	return aa.Req(ctx, "DELETE", path, queryStruct, nil, responseBody)
 }
 
 func (aa *AdminApi) Post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 
-	return aa.Req(ctx, "post", path, queryStruct, requestBody, responseBody)
+	return aa.Req(ctx, "POST", path, queryStruct, requestBody, responseBody)
 }
 
 func (aa *AdminApi) Put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "put", path, queryStruct, requestBody, responseBody)
+	return aa.Req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
 }
 
 func (aa *AdminApi) Req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
-
-	s := sling.New().Client(aa.c).QueryStruct(frj).QueryStruct(queryStruct).BodyJSON(requestBody)
-
-	switch verb {
-	case "get":
-		s = s.Get(url)
-	case "post":
-		s = s.Post(url)
-	case "put":
-		s = s.Put(url)
-	case "delete":
-		s = s.Delete(url)
-	default:
-		return fmt.Errorf("unsupported verb %s", verb)
+	var qs string
+	if queryStruct != nil {
+		v, err := query.Values(queryStruct)
+		if err != nil {
+			return err
+		}
+		qs = v.Encode()
 	}
 
-	req, err := s.Request()
+	if qs != "" {
+		if strings.Contains(url, "?") {
+			url = url + "&" + qs
+		} else {
+			url = url + "?" + qs
+		}
+	}
+
+	var bodyReader io.Reader
+	if requestBody != nil {
+		bjson, err := json.Marshal(requestBody)
+		if err != nil {
+			return err
+		}
+		bodyReader = bytes.NewReader(bjson)
+	}
+	req, err := http.NewRequest(verb, url, bodyReader)
 	if err != nil {
 		return err
 	}
 
 	req.WithContext(ctx)
 
-	_ = awsauth.Sign4(req, *aa.creds)
+	// _ = awsauth.Sign4(req, *aa.creds)
+	_ = awsauth.SignS3(req, *aa.creds)
 
 	// This is to appease AWS signature algorithm.  spaces must
 	// be %20, go defaults to +
 	req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
-
-	fmt.Printf("URL is: %#v\n", req.URL)
 
 	resp, err := aa.c.Do(req)
 	if err != nil {
