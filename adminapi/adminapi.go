@@ -99,23 +99,23 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 }
 
 func (aa *AdminApi) Get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "GET", path, queryStruct, nil, responseBody)
+	return aa.req(ctx, "GET", path, queryStruct, nil, responseBody)
 }
 
 func (aa *AdminApi) Delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "DELETE", path, queryStruct, nil, responseBody)
+	return aa.req(ctx, "DELETE", path, queryStruct, nil, responseBody)
 }
 
 func (aa *AdminApi) Post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 
-	return aa.Req(ctx, "POST", path, queryStruct, requestBody, responseBody)
+	return aa.req(ctx, "POST", path, queryStruct, requestBody, responseBody)
 }
 
 func (aa *AdminApi) Put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-	return aa.Req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
+	return aa.req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
+func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
 	var qs string
