@@ -74,7 +74,7 @@ type MUserResponse struct {
 
 // This is the radosgw-admin metadata list user command
 // Returns a list of usernames
-func (aa *AdminApi) MListUsers(ctx context.Context) ([]string, error) {
+func (aa *AdminAPI) MListUsers(ctx context.Context) ([]string, error) {
 	resp := []string{}
 	err := aa.get(ctx, "/metadata/user", nil, &resp)
 	return resp, err
@@ -82,7 +82,7 @@ func (aa *AdminApi) MListUsers(ctx context.Context) ([]string, error) {
 
 // This is the radosgw-admin metadata get user command
 // Returns metadata about a single user
-func (aa *AdminApi) MGetUser(ctx context.Context, user string) (*MUserResponse, error) {
+func (aa *AdminAPI) MGetUser(ctx context.Context, user string) (*MUserResponse, error) {
 	mr := &MetaReq{user}
 	resp := &MUserResponse{}
 
@@ -92,7 +92,7 @@ func (aa *AdminApi) MGetUser(ctx context.Context, user string) (*MUserResponse, 
 
 // This is the "radosgw-admin metadata list bucket" command
 // Returns a list of usernames
-func (aa *AdminApi) MListBuckets(ctx context.Context) ([]string, error) {
+func (aa *AdminAPI) MListBuckets(ctx context.Context) ([]string, error) {
 	resp := []string{}
 	err := aa.get(ctx, "/metadata/bucket", nil, &resp)
 	return resp, err
@@ -100,7 +100,7 @@ func (aa *AdminApi) MListBuckets(ctx context.Context) ([]string, error) {
 
 // This is the radosgw-admin metadata get bucket command
 // Returns metadata about a single bucket
-func (aa *AdminApi) MGetBucket(ctx context.Context, bucket string) (*MBucketResponse, error) {
+func (aa *AdminAPI) MGetBucket(ctx context.Context, bucket string) (*MBucketResponse, error) {
 	mr := &MetaReq{bucket}
 	resp := &MBucketResponse{}
 
@@ -110,7 +110,7 @@ func (aa *AdminApi) MGetBucket(ctx context.Context, bucket string) (*MBucketResp
 
 // This is the "radosgw-admin metadata list bucket.instance" command
 // Returns a list of usernames
-func (aa *AdminApi) MListBucketInstances(ctx context.Context) ([]string, error) {
+func (aa *AdminAPI) MListBucketInstances(ctx context.Context) ([]string, error) {
 	resp := []string{}
 	err := aa.get(ctx, "/metadata/bucket.instance", nil, &resp)
 	return resp, err
@@ -118,7 +118,7 @@ func (aa *AdminApi) MListBucketInstances(ctx context.Context) ([]string, error) 
 
 // This is the radosgw-admin metadata get bucket.instance command
 // Returns metadata about a single bucket.instance
-func (aa *AdminApi) MGetBucketInstance(ctx context.Context, bucket string) (*MBucketInstanceResponse, error) {
+func (aa *AdminAPI) MGetBucketInstance(ctx context.Context, bucket string) (*MBucketInstanceResponse, error) {
 	mr := &MetaReq{bucket}
 	resp := &MBucketInstanceResponse{}
 

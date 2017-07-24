@@ -18,44 +18,41 @@ import (
 	"github.com/smartystreets/go-aws-auth"
 )
 
-var tz *time.Location = nil
+var tz *time.Location
 
-var falsch bool = false
+var falsch = false
 
 func init() {
 	tz, _ = time.LoadLocation("Local") // Defaults to local
 }
 
-func SetTimezone(loc *time.Location) {
+// SetTimeZone - override time zone
+func SetTimeZone(loc *time.Location) {
 	tz = loc
 }
 
-type FormatReq struct {
-	Format string `url:"format"`
-}
-
-var frj = &FormatReq{"json"}
-
-// Use this type whenever you want to make an API call where a bool defaults to
+// FalseRef - Use this type whenever you want to make an API call where a bool defaults to
 // true if omitted, and want it to actually be false.  In such cases, the struct
 // contains a reference to a bool versus a bool, since you cannot otherwise
 // differentiate false with unspecified.  This represents a reference to a
 // boolean false value.
-var FalseRef *bool = &falsch
+var FalseRef = &falsch
 
-type AdminApi struct {
+// AdminAPI - admin api struct
+type AdminAPI struct {
 	c     *http.Client
 	u     *url.URL
 	t     *http.Transport
 	creds *awsauth.Credentials
 }
 
-func NewAdminApi(cfg *Config) (*AdminApi, error) {
-	baseUrl := strings.Trim(cfg.ServerURL, "/")
+// NewAdminAPI - AdminAPI factory method.
+func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
+	baseURL := strings.Trim(cfg.ServerURL, "/")
 	adminPath := strings.Trim(cfg.AdminPath, "/")
-	aa := &AdminApi{}
+	aa := &AdminAPI{}
 	var err error
-	aa.u, err = url.Parse(baseUrl + "/" + adminPath)
+	aa.u, err = url.Parse(baseURL + "/" + adminPath)
 	if err != nil {
 		return nil, err
 	}
@@ -98,24 +95,24 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 	return aa, nil
 }
 
-func (aa *AdminApi) get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+func (aa *AdminAPI) get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "GET", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+func (aa *AdminAPI) delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "DELETE", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+func (aa *AdminAPI) post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 
 	return aa.req(ctx, "POST", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+func (aa *AdminAPI) put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
+func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
 	if queryStruct != nil {
@@ -147,6 +144,7 @@ func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, req
 	}
 
 	req.WithContext(ctx)
+	req.URL.Query().Set("format", "json")
 
 	_ = awsauth.SignS3(req, *aa.creds)
 
@@ -172,6 +170,7 @@ func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, req
 	return d.Decode(responseBody)
 }
 
+// Config - this configures an AdminAPI
 type Config struct {
 	ClientTimeout      Duration
 	ServerURL          string
@@ -182,16 +181,20 @@ type Config struct {
 	awsauth.Credentials
 }
 
+// Duration - this allows us to use a text representation
+// of a duration and have it parse correctly.
 type Duration struct {
 	time.Duration
 }
 
+// UnmarshalText - this implements the TextUnmarshaller
 func (d *Duration) UnmarshalText(text []byte) error {
 	var err error
 	d.Duration, err = time.ParseDuration(string(text))
 	return err
 }
 
-func (aa *AdminApi) HttpClient() *http.Client {
+// HTTPClient return the underlying http.Client
+func (aa *AdminAPI) HTTPClient() *http.Client {
 	return aa.c
 }

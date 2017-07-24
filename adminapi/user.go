@@ -5,7 +5,7 @@ import (
 )
 
 type UserInfoRequest struct {
-	Uid string `url:"uid"`
+	UID string `url:"uid"`
 }
 
 type UserDeleteRequest UserInfoRequest
@@ -23,7 +23,7 @@ type UserInfoResponse struct {
 }
 
 type UserCreateRequest struct {
-	Uid         string   `url:"uid"`
+	UID         string   `url:"uid"`
 	DisplayName string   `url:"display-name"`
 	Email       string   `url:"email,omitempty"`
 	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
@@ -36,7 +36,7 @@ type UserCreateRequest struct {
 }
 
 type UserModifyRequest struct {
-	Uid         string   `url:"uid"`
+	UID         string   `url:"uid"`
 	DisplayName string   `url:"display-name"`
 	Email       string   `url:"email,omitempty"`
 	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
@@ -85,7 +85,7 @@ type SubUserCreateRequest struct {
 
 type UserCaps []UserCapability
 
-func (aa *AdminApi) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
+func (aa *AdminAPI) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
 	uir := &UserInfoRequest{uid}
 	resp := &UserInfoResponse{}
 
@@ -93,24 +93,24 @@ func (aa *AdminApi) UserInfo(ctx context.Context, uid string) (*UserInfoResponse
 	return resp, err
 }
 
-func (aa *AdminApi) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
+func (aa *AdminAPI) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.put(ctx, "/user", cur, nil, resp)
 	return resp, err
 }
 
-func (aa *AdminApi) UserRm(ctx context.Context, uid string) error {
+func (aa *AdminAPI) UserRm(ctx context.Context, uid string) error {
 	udr := &UserDeleteRequest{uid}
 	return aa.delete(ctx, "/user", udr, nil)
 }
 
-func (aa *AdminApi) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
+func (aa *AdminAPI) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }
 
-func (aa *AdminApi) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
+func (aa *AdminAPI) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
 	resp := []SubUser{}
 	err := aa.put(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err

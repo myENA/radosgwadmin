@@ -36,21 +36,21 @@ func main() {
 		log.Fatalf("Could not parse config file: %s", err)
 	}
 
-	if cfg.Server == nil || cfg.AdminApi == nil {
+	if cfg.Server == nil || cfg.AdminAPI == nil {
 		log.Fatalf("Need to specify both [server] and [adminapi] sections of config")
 	}
 
-	target, err := url.Parse(cfg.AdminApi.ServerURL)
+	target, err := url.Parse(cfg.AdminAPI.ServerURL)
 	if err != nil {
-		log.Fatalf("Could not parse URL: %s", cfg.AdminApi.ServerURL)
+		log.Fatalf("Could not parse URL: %s", cfg.AdminAPI.ServerURL)
 	}
 
-	aa, err := adminapi.NewAdminApi(cfg.AdminApi)
+	aa, err := adminapi.NewAdminAPI(cfg.AdminAPI)
 	if err != nil {
 		log.Fatalf("Could not initialize admin api: %s", err)
 	}
 
-	p := NewProxy(target, cfg, aa.HttpClient().Transport)
+	p := NewProxy(target, cfg, aa.HTTPClient().Transport)
 	http.HandleFunc("/", p.proxy.ServeHTTP)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Server.ServiceHost, cfg.Server.ServicePort), nil)
 
@@ -78,8 +78,8 @@ func (p *Proxy) Director(req *http.Request) {
 	req.URL.Scheme = target.Scheme
 	req.URL.Host = p.target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-	// _ = awsauth.Sign4(req, p.cfg.AdminApi.Credentials)
-	_ = awsauth.SignS3(req, p.cfg.AdminApi.Credentials)
+	// _ = awsauth.Sign4(req, p.cfg.AdminAPI.Credentials)
+	_ = awsauth.SignS3(req, p.cfg.AdminAPI.Credentials)
 	req.Header.Set("Host", target.Host)
 	if targetQuery == "" || req.URL.RawQuery == "" {
 		req.URL.RawQuery = targetQuery + req.URL.RawQuery
@@ -108,7 +108,7 @@ var (
 
 type Config struct {
 	Server   *ServerConfig
-	AdminApi *adminapi.Config
+	AdminAPI *adminapi.Config
 }
 
 type ServerConfig struct {

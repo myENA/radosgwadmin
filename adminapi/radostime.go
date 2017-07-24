@@ -5,12 +5,17 @@ import (
 	"time"
 )
 
+// RadosTime - This knows how to use the date time formats returned
+// from the rados gateway.
 type RadosTime time.Time
 
+// RadosTimeFormat - this is the most common rados time format
 const RadosTimeFormat string = "2006-01-02 15:04:05.000000Z07:00"
 
+// RadosBucketTimeFormat - used for bucket calls
 const RadosBucketTimeFormat string = "2006-01-02 15:04:05.000000"
 
+// UnmarshalText - implements TextUnmarshaler
 func (rt *RadosTime) UnmarshalText(text []byte) error {
 	var err error
 	t := (*time.Time)(rt)
@@ -21,6 +26,7 @@ func (rt *RadosTime) UnmarshalText(text []byte) error {
 	return err
 }
 
+// MarshalText - implements TextUnmarshaler
 func (rt RadosTime) MarshalText() ([]byte, error) {
 	t := time.Time(rt)
 	if y := t.Year(); y < 0 || y >= 10000 {

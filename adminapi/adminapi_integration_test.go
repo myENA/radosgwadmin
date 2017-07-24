@@ -18,14 +18,14 @@ import (
 
 type IntegrationsSuite struct {
 	suite.Suite
-	aa           *AdminApi
+	aa           *AdminAPI
 	randFilePath string
 	lf           *os.File
 }
 
 type IntegrationConfig struct {
 	Integration *Integration
-	AdminApi    *Config
+	AdminAPI    *Config
 }
 
 type Integration struct {
@@ -74,9 +74,9 @@ func (is *IntegrationsSuite) SetupSuite() {
 	if err != nil {
 		log.Fatalf("cannot parse config file at location '%s' : %s", cfgFile, err)
 	}
-	is.aa, err = NewAdminApi(cfg.AdminApi)
+	is.aa, err = NewAdminAPI(cfg.AdminAPI)
 	if err != nil {
-		log.Fatalf("Error initializing AdminApi: %s", err)
+		log.Fatalf("Error initializing AdminAPI: %s", err)
 	}
 
 }
@@ -101,7 +101,7 @@ func (is *IntegrationsSuite) Test02Metadata() {
 
 func (is *IntegrationsSuite) Test03User() {
 	ur := new(UserCreateRequest)
-	ur.Uid = "testuser"
+	ur.UID = "testuser"
 	ur.Email = "test.user@asdf.org"
 	ur.DisplayName = "Test User"
 	ur.UserCaps = UserCaps{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
@@ -116,7 +116,7 @@ func (is *IntegrationsSuite) Test03User() {
 	sur.GenerateSecret = true
 	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
 	is.NoError(err)
-	log.Printf("#v", nresp)
+	log.Printf("%#v", nresp)
 }
 
 func TestIntegrations(t *testing.T) {
