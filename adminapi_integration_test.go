@@ -1,6 +1,6 @@
 // +build integration
 
-package adminapi
+package radosgwadmin
 
 import (
 	"context"

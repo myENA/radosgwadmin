@@ -1,4 +1,4 @@
-package adminapi
+package radosgwadmin
 
 // BucketRequest - bucket request struct
 type BucketRequest struct {

@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"strings"
 
-	"bitbucket.ena.net/go/radosgwadmin/adminapi"
+	adminapi "bitbucket.ena.net/go/radosgwadmin"
 	"github.com/BurntSushi/toml"
 	"github.com/smartystreets/go-aws-auth"
 )
