@@ -105,6 +105,7 @@ func (is *IntegrationsSuite) Test03User() {
 	ur.Email = "test.user@asdf.org"
 	ur.DisplayName = "Test User"
 	ur.UserCaps = UserCaps{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
+
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
 	log.Printf("%#v", resp)

@@ -11,19 +11,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
 	"github.com/smartystreets/go-aws-auth"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 var tz *time.Location
 
 var falsch = false
 
+var validate *validator.Validate
+
 func init() {
 	tz, _ = time.LoadLocation("Local") // Defaults to local
+	validate = validator.New()
 }
 
 // SetTimeZone - override time zone.  Not thread-safe, do
@@ -120,15 +125,35 @@ func (aa *AdminAPI) put(ctx context.Context, path string, queryStruct, requestBo
 	return aa.req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
 }
 
+func isNil(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	v := reflect.ValueOf(i)
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Slice, reflect.Array:
+		return v.IsNil()
+
+	default:
+		panic("Invalid interface type")
+	}
+}
+
 func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
-	if queryStruct != nil {
+	if !isNil(queryStruct) {
+		err := validate.Struct(queryStruct)
+		if err != nil {
+			return err
+		}
 		v, err := query.Values(queryStruct)
 		if err != nil {
 			return err
 		}
+
 		qs := v.Encode()
+
 		if qs != "" {
 			if strings.Contains(url, "?") {
 				url = url + "&" + qs
@@ -136,10 +161,15 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 				url = url + "?" + qs
 			}
 		}
+		fmt.Printf("query parameters: %s\n", url)
 	}
 
 	var bodyReader io.Reader
-	if requestBody != nil {
+	if !isNil(requestBody) {
+		err := validate.Struct(requestBody)
+		if err != nil {
+			return err
+		}
 		bjson, err := json.Marshal(requestBody)
 		if err != nil {
 			return err

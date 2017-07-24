@@ -1,5 +1,9 @@
 package radosgwadmin
 
+import (
+	"context"
+)
+
 // BucketRequest - bucket request struct
 type BucketRequest struct {
 	Bucket string `url:"bucket,omitempty"`
@@ -35,4 +39,19 @@ type BucketQuota struct {
 	Enabled    bool `json:"enabled"`
 	MaxSizeKb  int  `json:"max_size_kb"`
 	MaxObjects int  `json:"max_objects"`
+}
+
+// ListBuckets - return a list of all buckets
+func (aa *AdminAPI) ListBuckets(ctx context.Context) ([]string, error) {
+	resp := []string{}
+	err := aa.get(ctx, "/bucket", nil, resp)
+	return resp, err
+}
+
+// ListBuckets - return a list of all buckets
+func (aa *AdminAPI) GetBucket(ctx context.Context, uid string) ([]string, error) {
+	uir := &userInfoRequest{uid}
+	resp := []string{}
+	err := aa.get(ctx, "/bucket", uir, resp)
+	return resp, err
 }

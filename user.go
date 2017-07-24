@@ -8,7 +8,10 @@ type userInfoRequest struct {
 	UID string `url:"uid"`
 }
 
-type userDeleteRequest userInfoRequest
+type userDeleteRequest struct {
+	UID       string `url:"uid"`
+	PurgeData bool   `url:"purge-data"`
+}
 
 // UserInfoResponse - respone from a user info request.
 type UserInfoResponse struct {
@@ -25,10 +28,10 @@ type UserInfoResponse struct {
 
 // UserCreateRequest - describes what to do in a user create operation.
 type UserCreateRequest struct {
-	UID         string   `url:"uid"`
+	UID         string   `url:"uid" validate:"required"`
 	DisplayName string   `url:"display-name"`
-	Email       string   `url:"email,omitempty"`
-	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
+	Email       string   `url:"email,omitempty" validate:"omitempty,email"`
+	KeyType     string   `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
 	AccessKey   string   `url:"access-key,omitempty"`
 	SecretKey   string   `url:"secret-key,omitempty"`
 	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
@@ -39,10 +42,10 @@ type UserCreateRequest struct {
 
 // UserModifyRequest - modify user request type.
 type UserModifyRequest struct {
-	UID         string   `url:"uid"`
-	DisplayName string   `url:"display-name"`
+	UID         string   `url:"uid" validate:"nonzero"`
+	DisplayName string   `url:"display-name,omitempty"`
 	Email       string   `url:"email,omitempty"`
-	KeyType     string   `url:"key-type,omitempty" enum:"swift|s3|"`
+	KeyType     string   `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
 	AccessKey   string   `url:"access-key,omitempty"`
 	SecretKey   string   `url:"secret-key,omitempty"`
 	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
@@ -72,7 +75,7 @@ type SwiftKey struct {
 
 // UserCapability - desribes user capabilities / permissions.
 type UserCapability struct {
-	Type       string `json:"type" enum:"users|buckets|metadata|usage|zone"`
+	Type       string `json:"type" validate:"users|buckets|metadata|usage|zone"`
 	Permission string `json:"perm" enum:"*|read|write|read,write"`
 }
 
@@ -111,8 +114,8 @@ func (aa *AdminAPI) UserCreate(ctx context.Context, cur *UserCreateRequest) (*Us
 }
 
 // UserRm - delete user uid
-func (aa *AdminAPI) UserRm(ctx context.Context, uid string) error {
-	udr := &userDeleteRequest{uid}
+func (aa *AdminAPI) UserRm(ctx context.Context, uid string, purge bool) error {
+	udr := &userDeleteRequest{uid, purge}
 	return aa.delete(ctx, "/user", udr, nil)
 }
 
