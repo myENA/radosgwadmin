@@ -76,7 +76,7 @@ type MUserResponse struct {
 // Returns a list of usernames
 func (aa *AdminApi) MListUsers(ctx context.Context) ([]string, error) {
 	resp := []string{}
-	err := aa.Get(ctx, "/metadata/user", nil, &resp)
+	err := aa.get(ctx, "/metadata/user", nil, &resp)
 	return resp, err
 }
 
@@ -86,7 +86,7 @@ func (aa *AdminApi) MGetUser(ctx context.Context, user string) (*MUserResponse, 
 	mr := &MetaReq{user}
 	resp := &MUserResponse{}
 
-	err := aa.Get(ctx, "metadata/user", mr, resp)
+	err := aa.get(ctx, "metadata/user", mr, resp)
 	return resp, err
 }
 
@@ -94,7 +94,7 @@ func (aa *AdminApi) MGetUser(ctx context.Context, user string) (*MUserResponse, 
 // Returns a list of usernames
 func (aa *AdminApi) MListBuckets(ctx context.Context) ([]string, error) {
 	resp := []string{}
-	err := aa.Get(ctx, "/metadata/bucket", nil, &resp)
+	err := aa.get(ctx, "/metadata/bucket", nil, &resp)
 	return resp, err
 }
 
@@ -104,7 +104,7 @@ func (aa *AdminApi) MGetBucket(ctx context.Context, bucket string) (*MBucketResp
 	mr := &MetaReq{bucket}
 	resp := &MBucketResponse{}
 
-	err := aa.Get(ctx, "metadata/bucket", mr, resp)
+	err := aa.get(ctx, "metadata/bucket", mr, resp)
 	return resp, err
 }
 
@@ -112,7 +112,7 @@ func (aa *AdminApi) MGetBucket(ctx context.Context, bucket string) (*MBucketResp
 // Returns a list of usernames
 func (aa *AdminApi) MListBucketInstances(ctx context.Context) ([]string, error) {
 	resp := []string{}
-	err := aa.Get(ctx, "/metadata/bucket.instance", nil, &resp)
+	err := aa.get(ctx, "/metadata/bucket.instance", nil, &resp)
 	return resp, err
 }
 
@@ -122,6 +122,6 @@ func (aa *AdminApi) MGetBucketInstance(ctx context.Context, bucket string) (*MBu
 	mr := &MetaReq{bucket}
 	resp := &MBucketInstanceResponse{}
 
-	err := aa.Get(ctx, "metadata/bucket.instance", mr, resp)
+	err := aa.get(ctx, "metadata/bucket.instance", mr, resp)
 	return resp, err
 }

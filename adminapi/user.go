@@ -89,29 +89,29 @@ func (aa *AdminApi) UserInfo(ctx context.Context, uid string) (*UserInfoResponse
 	uir := &UserInfoRequest{uid}
 	resp := &UserInfoResponse{}
 
-	err := aa.Get(ctx, "/user", uir, resp)
+	err := aa.get(ctx, "/user", uir, resp)
 	return resp, err
 }
 
 func (aa *AdminApi) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.Put(ctx, "/user", cur, nil, resp)
+	err := aa.put(ctx, "/user", cur, nil, resp)
 	return resp, err
 }
 
 func (aa *AdminApi) UserRm(ctx context.Context, uid string) error {
 	udr := &UserDeleteRequest{uid}
-	return aa.Delete(ctx, "/user", udr, nil)
+	return aa.delete(ctx, "/user", udr, nil)
 }
 
 func (aa *AdminApi) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.Post(ctx, "/user", umr, nil, resp)
+	err := aa.post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }
 
 func (aa *AdminApi) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
 	resp := []SubUser{}
-	err := aa.Put(ctx, "/user?subuser", sucr, nil, &resp)
+	err := aa.put(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err
 }

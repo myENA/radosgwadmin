@@ -20,14 +20,14 @@ type TrimUsageRequest struct {
 }
 
 func (aa *AdminApi) TrimUsage(ctx context.Context, treq *TrimUsageRequest) error {
-	err := aa.Delete(ctx, "/usage", treq, nil)
+	err := aa.delete(ctx, "/usage", treq, nil)
 	return err
 }
 
 func (aa *AdminApi) GetUsage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
-	err := aa.Get(ctx, "/usage", ureq, uresp)
+	err := aa.get(ctx, "/usage", ureq, uresp)
 	return uresp, err
 }
 

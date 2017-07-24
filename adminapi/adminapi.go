@@ -98,40 +98,38 @@ func NewAdminApi(cfg *Config) (*AdminApi, error) {
 	return aa, nil
 }
 
-func (aa *AdminApi) Get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+func (aa *AdminApi) get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "GET", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) Delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
+func (aa *AdminApi) delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "DELETE", path, queryStruct, nil, responseBody)
 }
 
-func (aa *AdminApi) Post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+func (aa *AdminApi) post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 
 	return aa.req(ctx, "POST", path, queryStruct, requestBody, responseBody)
 }
 
-func (aa *AdminApi) Put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
+func (aa *AdminApi) put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
 	return aa.req(ctx, "PUT", path, queryStruct, requestBody, responseBody)
 }
 
 func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, requestBody, responseBody interface{}) error {
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
-	var qs string
 	if queryStruct != nil {
 		v, err := query.Values(queryStruct)
 		if err != nil {
 			return err
 		}
-		qs = v.Encode()
-	}
-
-	if qs != "" {
-		if strings.Contains(url, "?") {
-			url = url + "&" + qs
-		} else {
-			url = url + "?" + qs
+		qs := v.Encode()
+		if qs != "" {
+			if strings.Contains(url, "?") {
+				url = url + "&" + qs
+			} else {
+				url = url + "?" + qs
+			}
 		}
 	}
 
@@ -150,7 +148,6 @@ func (aa *AdminApi) req(ctx context.Context, verb, path string, queryStruct, req
 
 	req.WithContext(ctx)
 
-	// _ = awsauth.Sign4(req, *aa.creds)
 	_ = awsauth.SignS3(req, *aa.creds)
 
 	// This is to appease AWS signature algorithm.  spaces must
