@@ -53,6 +53,10 @@ type AdminAPI struct {
 	creds *awsauth.Credentials
 }
 
+type customDecoder interface {
+	decode(data io.Reader) error
+}
+
 // NewAdminAPI - AdminAPI factory method.
 func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	baseURL := strings.Trim(cfg.ServerURL, "/")
@@ -203,8 +207,15 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 		return nil
 	}
 
-	d := json.NewDecoder(resp.Body)
-	return d.Decode(responseBody)
+	if !isNil(responseBody) {
+
+		if cd, ok := responseBody.(customDecoder); ok {
+			return cd.decode(resp.Body)
+		}
+		d := json.NewDecoder(resp.Body)
+		return d.Decode(responseBody)
+	}
+	return nil
 }
 
 // Config - this configures an AdminAPI.

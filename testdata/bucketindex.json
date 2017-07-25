@@ -1,0 +1,1 @@
+["key.json","pics\/kitten.jpg","win_virtio_scsi.xml"]{"existing_header":{"usage":{"rgw.none":{"size_kb":5,"size_kb_actual":1,"num_objects":3},"rgw.main":{"size_kb":4,"size_kb_actual":7,"num_objects":9}}},"calculated_header":{"usage":{}}}

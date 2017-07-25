@@ -58,17 +58,6 @@ func (is *IntegrationsSuite) SetupSuite() {
 		log.Fatalf("Got error opening config file: %s", err)
 	}
 
-	//	is.randFilePath = datadir + "/10mbfile.bin"
-	//	if _, err = os.Stat(is.randFilePath); os.IsNotExist(err) {
-	//		f, err := os.Create(is.randFilePath)
-	//		if err != nil {
-	//			log.Fatalf("Cannot create file %s: %s", is.randFilePath, err)
-	//		}
-	//		r := rand.New(rand.NewSource(1))
-	//		defer f.Close()
-	//		_, err = io.CopyN(f, r, 10*1024*1024)
-	//	}
-
 	cfg := &IntegrationConfig{}
 	_, err = toml.Decode(string(cfgFile), cfg)
 	if err != nil {
@@ -109,7 +98,7 @@ func (is *IntegrationsSuite) Test03UserCreate() {
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
 	log.Printf("%#v", resp)
-	sur := new(SubUserCreateRequest)
+	sur := new(SubUserCreateModifyRequest)
 	sur.UID = "testuser"
 	sur.Access = "full"
 	sur.KeyType = "s3"
@@ -127,7 +116,7 @@ func (is *IntegrationsSuite) Test04Quota() {
 	qsr.MaximumSizeKb = 8192
 	qsr.QuotaType = "user"
 	qsr.UID = "testuser"
-	err := is.aa.SetQuota(context.Background(), qsr)
+	err := is.aa.QuotaSet(context.Background(), qsr)
 	is.NoError(err, "Got error running SetQuota")
 	// read it back
 	qresp, err := is.aa.QuotaUser(context.Background(), "testuser")

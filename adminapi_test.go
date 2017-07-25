@@ -1,6 +1,7 @@
 package radosgwadmin
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	// "github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -29,7 +31,7 @@ func (ms *ModelsSuite) SetupSuite() {
 		&BucketRequest{},
 		&UserCreateRequest{},
 		&UserModifyRequest{},
-		&SubUserCreateRequest{},
+		&SubUserCreateModifyRequest{},
 	}
 	datadir := os.Getenv("ADMINAPI_TEST_DATADIR")
 	if datadir == "" {
@@ -88,11 +90,20 @@ func (ms *ModelsSuite) Test02Usage() {
 
 func (ms *ModelsSuite) Test03Bucket() {
 	bucketjson := ms.dbags["bucket"]
-	resp := &BucketResponse{}
+	resp := &BucketStatsResponse{}
 	err := json.Unmarshal(bucketjson, resp)
 	ms.NoError(err, "Error unmarshaling bucket json")
 	fmt.Printf("bucket response:\n%#v\n", resp)
 	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
+
+	bucketindjson := ms.dbags["bucketindex"]
+	bir := &BucketIndexResponse{}
+	err = bir.decode(bytes.NewReader(bucketindjson))
+	ms.NoError(err, "Error unmarshaling bucket index json")
+	ms.Equal(bir.NewObjects[0], "key.json", "first element of NewObjects not as expected")
+	ms.Equal(len(bir.NewObjects), 3, "length of NewObjects not 3")
+	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWMain.NumObjects, 9, "rgwmain num objects not as expected")
+	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWNone.SizeKb, 5, "rgwnone num objects not as expected")
 }
 
 func (ms *ModelsSuite) Test04Metadata() {

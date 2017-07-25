@@ -84,14 +84,21 @@ func (uc UserCapability) String() string {
 	return uc.Type + "=" + uc.Permission
 }
 
-// SubUserCreateRequest - Create sub user request.
-type SubUserCreateRequest struct {
+// SubUserCreateModifyRequest - Create or modify sub user request.
+type SubUserCreateModifyRequest struct {
 	UID            string `url:"uid" validate:"required"`
 	SubUser        string `url:"subuser" validate:"required"`
 	SecretKey      string `url:"secret-key,omitempty"`
-	KeyType        string `url:"key-type,omitempty"`
+	KeyType        string `url:"key-type,omitempty" validate:"omitempty,eq=s3|eq=swift"`
 	Access         string `url:"access,omitempty" validate:"omitempty,eq=read|eq=write|eq=readwrite|eq=full"`
 	GenerateSecret bool   `url:"generate-secret,omitempty"`
+}
+
+// SubUserRmRequest - if PurgeKeys is nil, defaults to true
+type SubUserRmRequest struct {
+	UID       string `url:"uid" validate:"required"`
+	SubUser   string `url:"subuser" validate:"required"`
+	PurgeKeys *bool  `url:"purge-keys,omitempty"` // Default true
 }
 
 // UserCaps - list of UserCapability
@@ -119,16 +126,28 @@ func (aa *AdminAPI) UserRm(ctx context.Context, uid string, purge bool) error {
 	return aa.delete(ctx, "/user", udr, nil)
 }
 
-// UserUpdate - update a user described by umr
-func (aa *AdminAPI) UserUpdate(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
+// UserModify - modify a user described by umr
+func (aa *AdminAPI) UserModify(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
 	err := aa.post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }
 
 // SubUserCreate - create a subuser
-func (aa *AdminAPI) SubUserCreate(ctx context.Context, sucr *SubUserCreateRequest) ([]SubUser, error) {
+func (aa *AdminAPI) SubUserCreate(ctx context.Context, sucr *SubUserCreateModifyRequest) ([]SubUser, error) {
 	resp := []SubUser{}
 	err := aa.put(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err
+}
+
+// SubUserModify - modify a subuser
+func (aa *AdminAPI) SubUserModify(ctx context.Context, sucr *SubUserCreateModifyRequest) ([]SubUser, error) {
+	resp := []SubUser{}
+	err := aa.post(ctx, "/user?subuser", sucr, nil, &resp)
+	return resp, err
+}
+
+// SubUserRm - delete a subuser
+func (aa *AdminAPI) SubUserRm(ctx context.Context, surm *SubUserRmRequest) error {
+	return aa.delete(ctx, "/user?subuser", surm, nil)
 }

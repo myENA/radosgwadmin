@@ -2,6 +2,8 @@ package radosgwadmin
 
 import (
 	"context"
+	"encoding/json"
+	"io"
 )
 
 // BucketRequest - bucket request struct
@@ -11,8 +13,58 @@ type BucketRequest struct {
 	Stats  bool   `url:"stats,omitempty"`
 }
 
-// BucketResponse - bucket response type
-type BucketResponse struct {
+// BucketIndexRequest - bucket index request struct
+type BucketIndexRequest struct {
+	Bucket       string `url:"bucket" validation:"required"`
+	CheckObjects bool   `url:"check-objects,omitempty"`
+	Fix          bool   `url:"fix,omitempty"`
+}
+
+// BucketIndexResponse - bucket index response struct
+type BucketIndexResponse struct {
+	NewObjects []string `json:"new_objects"`
+	Headers    struct {
+		ExistingHeader   *BucketUsage `json:"existing_header,omitempty"`
+		CalculatedHeader *BucketUsage `json:"calculated_header,omitempty"`
+	} `json:"headers"`
+}
+
+// Implements the customDecoder interface
+func (bir *BucketIndexResponse) decode(data io.Reader) error {
+	// rgw does some weird shit with this response.
+	dec := json.NewDecoder(data)
+	err := dec.Decode(&bir.NewObjects)
+	if err != nil {
+		return err
+	}
+	if dec.More() {
+		err = dec.Decode(&bir.Headers)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// BucketUsage - bucket usage collection
+type BucketUsage struct {
+	Usage struct {
+		RGWNone      *BucketUsageEntry `json:"rgw.none,omitempty"`
+		RGWMain      *BucketUsageEntry `json:"rgw.main,omitempty"`
+		RGWShadow    *BucketUsageEntry `json:"rgw.shadow,omitempty"`
+		RGWMultiMeta *BucketUsageEntry `json:"rgw.multimeta,omitempty"`
+	} `json:"usage"`
+}
+
+// BucketUsageEntry - entry for each bucket usage bit.
+type BucketUsageEntry struct {
+	SizeKb       int `json:"size_kb"`
+	SizeKbActual int `json:"size_kb_actual"`
+	NumObjects   int `json:"num_objects"`
+}
+
+// BucketStatsResponse - bucket stats response type
+type BucketStatsResponse struct {
 	Bucket      string                      `json:"bucket"`
 	Pool        string                      `json:"pool"`
 	IndexPool   string                      `json:"index_pool"`
@@ -27,13 +79,6 @@ type BucketResponse struct {
 	BucketQuota *BucketQuota                `json:"bucket_quota"`
 }
 
-// BucketUsageEntry - bucket usage entry
-type BucketUsageEntry struct {
-	NumObjects   int `json:"num_objects"`
-	SizeKb       int `json:"size_kb"`
-	SizeKbActual int `json:"size_kb_actual"`
-}
-
 // BucketQuota - bucket quota metadata
 type BucketQuota struct {
 	Enabled    bool `json:"enabled"`
@@ -41,17 +86,32 @@ type BucketQuota struct {
 	MaxObjects int  `json:"max_objects"`
 }
 
-// ListBuckets - return a list of all buckets
-func (aa *AdminAPI) ListBuckets(ctx context.Context) ([]string, error) {
+// BucketList -
+//
+// return a list of all bucket names, optionally filtered by
+// uid and bucket name
+func (aa *AdminAPI) BucketList(ctx context.Context, uid string, bucket string) ([]string, error) {
+	breq := &BucketRequest{
+		UID:    uid,
+		Bucket: bucket,
+		Stats:  false,
+	}
 	resp := []string{}
-	err := aa.get(ctx, "/bucket", nil, resp)
+	err := aa.get(ctx, "/bucket", breq, resp)
 	return resp, err
 }
 
-// ListBuckets - return a list of all buckets
-func (aa *AdminAPI) GetBucket(ctx context.Context, uid string) ([]string, error) {
-	uir := &userInfoRequest{uid}
-	resp := []string{}
-	err := aa.get(ctx, "/bucket", uir, resp)
+// BucketStats -
+//
+// return a list of all bucket stats, optionally filtered by
+// uid and bucket name
+func (aa *AdminAPI) BucketStats(ctx context.Context, uid string, bucket string) ([]BucketStatsResponse, error) {
+	breq := &BucketRequest{
+		UID:    uid,
+		Bucket: bucket,
+		Stats:  true,
+	}
+	resp := []BucketStatsResponse{}
+	err := aa.get(ctx, "/bucket", breq, resp)
 	return resp, err
 }
