@@ -99,7 +99,7 @@ func (is *IntegrationsSuite) Test02Metadata() {
 	log.Printf("users: %#v", users)
 }
 
-func (is *IntegrationsSuite) Test03User() {
+func (is *IntegrationsSuite) Test03UserCreate() {
 	ur := new(UserCreateRequest)
 	ur.UID = "testuser"
 	ur.Email = "test.user@asdf.org"
@@ -118,6 +118,39 @@ func (is *IntegrationsSuite) Test03User() {
 	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
 	is.NoError(err)
 	log.Printf("%#v", nresp)
+}
+
+func (is *IntegrationsSuite) Test04Quota() {
+	qsr := new(QuotaSetRequest)
+	qsr.Enabled = true
+	qsr.MaximumObjects = -1 // unlimited
+	qsr.MaximumSizeKb = 8192
+	qsr.QuotaType = "user"
+	qsr.UID = "testuser"
+	err := is.aa.SetQuota(context.Background(), qsr)
+	is.NoError(err, "Got error running SetQuota")
+	// read it back
+	qresp, err := is.aa.QuotaUser(context.Background(), "testuser")
+	log.Printf("%#v", qresp)
+	is.NoError(err, "Got error fetching user quota")
+	is.True(qresp.Enabled == true, "quota not enabled")
+	is.Equal(qresp.MaxObjects, int64(-1), "MaxObjects not -1")
+	is.Equal(qresp.MaxSizeKb, int64(8192), "MaxSizeKb not 8192")
+}
+
+func (is *IntegrationsSuite) Test05RmUser() {
+	err := is.aa.UserRm(context.Background(), "testuser", true)
+	is.NoError(err, "got error removing user")
+	users, err := is.aa.MListUsers(context.Background())
+	is.NoError(err, "got error listing users")
+	found := false
+	for _, user := range users {
+		if user == "testuser" {
+			found = true
+			break
+		}
+	}
+	is.False(found, "user not successfully deleted")
 }
 
 func TestIntegrations(t *testing.T) {

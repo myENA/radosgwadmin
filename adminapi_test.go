@@ -53,49 +53,7 @@ func (ms *ModelsSuite) SetupSuite() {
 
 }
 
-func (ms *ModelsSuite) Test01Usage() {
-	usagejson := ms.dbags["usage"]
-	resp := &UsageResponse{}
-	err := json.Unmarshal(usagejson, resp)
-	ms.NoError(err, "Error unmarshaling json")
-	ms.Len(resp.Entries, 1, "Expected number of entries not found")
-	ms.Len(resp.Entries[0].Buckets, 2, "Expected number of Buckets not found")
-	t, err := time.Parse(RadosTimeFormat, "2017-03-16 04:00:00.000000Z")
-	ms.NoError(err, "Error received when no error expected")
-	ms.Equal(time.Time(resp.Entries[0].Buckets[0].Time), t, "Time formats don't match")
-	ms.Len(resp.Summary, 1, "Expected summary size not found")
-	ms.Len(resp.Summary[0].Categories, 6, "Expected number of categories in the summary not found")
-
-}
-
-func (ms *ModelsSuite) Test02Bucket() {
-	bucketjson := ms.dbags["bucket"]
-	resp := &BucketResponse{}
-	err := json.Unmarshal(bucketjson, resp)
-	ms.NoError(err, "Error unmarshaling bucket json")
-	fmt.Printf("bucket response:\n%#v\n", resp)
-	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
-}
-
-func (ms *ModelsSuite) Test03Metadata() {
-	bucketjson := ms.dbags["mbucket"]
-	bresp := &MBucketResponse{}
-	err := json.Unmarshal(bucketjson, bresp)
-	ms.NoError(err, "Error unmarshaling mbucket json")
-	fmt.Printf("mbucket response:\n%#v\n", bresp)
-	userjson := ms.dbags["muser"]
-	uresp := &MUserResponse{}
-	err = json.Unmarshal(userjson, uresp)
-	ms.NoError(err, "Error unmarshaling muser json")
-	fmt.Printf("muser response:\n%#v\n", uresp)
-	bucketinstjson := ms.dbags["mbucketinstance"]
-	biresp := &MBucketInstanceResponse{}
-	err = json.Unmarshal(bucketinstjson, biresp)
-	ms.NoError(err, "Error unmarshaling mbucketinst json")
-	fmt.Printf("mbucket response:\n%#v\n", biresp)
-}
-
-func (ms *ModelsSuite) Test04Validators() {
+func (ms *ModelsSuite) Test01Validators() {
 	var structName string
 	defer func() {
 		if r := recover(); r != nil {
@@ -113,7 +71,57 @@ func (ms *ModelsSuite) Test04Validators() {
 	}
 }
 
+func (ms *ModelsSuite) Test02Usage() {
+	usagejson := ms.dbags["usage"]
+	resp := &UsageResponse{}
+	err := json.Unmarshal(usagejson, resp)
+	ms.NoError(err, "Error unmarshaling json")
+	ms.Len(resp.Entries, 1, "Expected number of entries not found")
+	ms.Len(resp.Entries[0].Buckets, 2, "Expected number of Buckets not found")
+	t, err := time.Parse(RadosTimeFormat, "2017-03-16 04:00:00.000000Z")
+	ms.NoError(err, "Error received when no error expected")
+	ms.Equal(time.Time(resp.Entries[0].Buckets[0].Time), t, "Time formats don't match")
+	ms.Len(resp.Summary, 1, "Expected summary size not found")
+	ms.Len(resp.Summary[0].Categories, 6, "Expected number of categories in the summary not found")
+
+}
+
+func (ms *ModelsSuite) Test03Bucket() {
+	bucketjson := ms.dbags["bucket"]
+	resp := &BucketResponse{}
+	err := json.Unmarshal(bucketjson, resp)
+	ms.NoError(err, "Error unmarshaling bucket json")
+	fmt.Printf("bucket response:\n%#v\n", resp)
+	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
+}
+
+func (ms *ModelsSuite) Test04Metadata() {
+	bucketjson := ms.dbags["mbucket"]
+	bresp := &MBucketResponse{}
+	err := json.Unmarshal(bucketjson, bresp)
+	ms.NoError(err, "Error unmarshaling mbucket json")
+	fmt.Printf("mbucket response:\n%#v\n", bresp)
+	userjson := ms.dbags["muser"]
+	uresp := &MUserResponse{}
+	err = json.Unmarshal(userjson, uresp)
+	ms.NoError(err, "Error unmarshaling muser json")
+	fmt.Printf("muser response:\n%#v\n", uresp)
+	bucketinstjson := ms.dbags["mbucketinstance"]
+	biresp := &MBucketInstanceResponse{}
+	err = json.Unmarshal(bucketinstjson, biresp)
+	ms.NoError(err, "Error unmarshaling mbucketinst json")
+	fmt.Printf("mbucket response:\n%#v\n", biresp)
+}
+
+func (ms *ModelsSuite) Test05Quotas() {
+	quotasjson := ms.dbags["quotas"]
+	resp := &Quotas{}
+	err := json.Unmarshal(quotasjson, resp)
+	ms.NoError(err, "Error unmarshaling quotas json")
+	ms.Equal(resp.BucketQuota.MaxObjects, int64(-1), "Value not expected")
+	ms.Equal(resp.UserQuota.MaxSizeKb, int64(-1), "Value not expected")
+}
+
 func TestAdminAPI(t *testing.T) {
 	suite.Run(t, new(ModelsSuite))
-
 }

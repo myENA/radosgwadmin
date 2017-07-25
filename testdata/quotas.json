@@ -1,0 +1,12 @@
+{
+   "bucket_quota" : {
+      "max_objects" : -1,
+      "enabled" : false,
+      "max_size_kb" : -1
+   },
+   "user_quota" : {
+      "max_size_kb" : -1,
+      "max_objects" : -1,
+      "enabled" : false
+   }
+}
