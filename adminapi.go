@@ -139,7 +139,7 @@ func isNil(i interface{}) bool {
 		return v.IsNil()
 
 	default:
-		panic("Invalid interface type")
+		panic("Invalid interface type: " + v.Kind().String())
 	}
 }
 

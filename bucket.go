@@ -97,7 +97,7 @@ func (aa *AdminAPI) BucketList(ctx context.Context, uid string, bucket string) (
 		Stats:  false,
 	}
 	resp := []string{}
-	err := aa.get(ctx, "/bucket", breq, resp)
+	err := aa.get(ctx, "/bucket", breq, &resp)
 	return resp, err
 }
 
@@ -112,6 +112,13 @@ func (aa *AdminAPI) BucketStats(ctx context.Context, uid string, bucket string) 
 		Stats:  true,
 	}
 	resp := []BucketStatsResponse{}
-	err := aa.get(ctx, "/bucket", breq, resp)
+	err := aa.get(ctx, "/bucket", breq, &resp)
+	return resp, err
+}
+
+// BucketIndex - Bucket index operations.  Bucket name required.
+func (aa *AdminAPI) BucketIndex(ctx context.Context, bireq *BucketIndexRequest) (*BucketIndexResponse, error) {
+	resp := &BucketIndexResponse{}
+	err := aa.get(ctx, "/bucket?index", bireq, resp)
 	return resp, err
 }

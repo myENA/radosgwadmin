@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/BurntSushi/toml"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -125,6 +126,28 @@ func (is *IntegrationsSuite) Test04Quota() {
 	is.True(qresp.Enabled == true, "quota not enabled")
 	is.Equal(qresp.MaxObjects, int64(-1), "MaxObjects not -1")
 	is.Equal(qresp.MaxSizeKb, int64(8192), "MaxSizeKb not 8192")
+}
+
+func (is *IntegrationsSuite) Test05Bucket() {
+	bucketnames, err := is.aa.BucketList(context.Background(), "", "")
+	is.NoError(err, "Got error fetching bucket names")
+	fmt.Printf("bucket names: %#v\n", bucketnames)
+	bucketstats, err := is.aa.BucketStats(context.Background(), "", "")
+	is.NoError(err, "got error fetching bucket stats")
+
+	log.Print(spew.Sdump(bucketstats))
+
+	// TODO - make code that creates a bucket and does stuff to test
+	// bucket index code. -- for now, do one I know already exists
+
+	bireq := &BucketIndexRequest{}
+	bireq.Bucket = "muhbucket"
+	bireq.CheckObjects = true
+	bireq.Fix = true
+	bucketindresp, err := is.aa.BucketIndex(context.Background(), bireq)
+	is.NoError(err, "Got error from BucketIndex()")
+	log.Printf(spew.Sdump(bucketindresp))
+
 }
 
 func (is *IntegrationsSuite) Test05RmUser() {
