@@ -21,14 +21,14 @@ type TrimUsageRequest struct {
 	RemoveAll bool      `url:"remove-all,omitempty"`
 }
 
-// TrimUsage - trim usage data
-func (aa *AdminAPI) TrimUsage(ctx context.Context, treq *TrimUsageRequest) error {
+// UsageTrim - trim usage data
+func (aa *AdminAPI) UsageTrim(ctx context.Context, treq *TrimUsageRequest) error {
 	err := aa.delete(ctx, "/usage", treq, nil)
 	return err
 }
 
-// GetUsage - Get usage data.
-func (aa *AdminAPI) GetUsage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
+// Usage - Get usage data.
+func (aa *AdminAPI) Usage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
 	err := aa.get(ctx, "/usage", ureq, uresp)

@@ -78,9 +78,11 @@ func (is *IntegrationsSuite) TearDownSuite() {
 }
 
 func (is *IntegrationsSuite) Test01Usage() {
-	usage, err := is.aa.GetUsage(context.Background(), nil)
-	is.NoError(err, "Got error running GetUsage")
+	usage, err := is.aa.Usage(context.Background(), nil)
+	is.NoError(err, "Got error getting Usage")
 	log.Printf("usage: %#v", usage)
+	err = is.aa.UsageTrim(context.Background(), &TrimUsageRequest{UID: "testuser"})
+	is.NoError(err, "Got error trimming usage")
 }
 
 func (is *IntegrationsSuite) Test02Metadata() {
