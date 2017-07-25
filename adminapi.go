@@ -131,7 +131,7 @@ func isNil(i interface{}) bool {
 	}
 	v := reflect.ValueOf(i)
 	switch v.Kind() {
-	case reflect.Ptr, reflect.Slice, reflect.Array:
+	case reflect.Ptr:
 		return v.IsNil()
 
 	default:
@@ -161,7 +161,6 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 				url = url + "?" + qs
 			}
 		}
-		fmt.Printf("query parameters: %s\n", url)
 	}
 
 	var bodyReader io.Reader

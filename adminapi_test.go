@@ -6,20 +6,31 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type ModelsSuite struct {
 	suite.Suite
 	dbags map[string][]byte
+	vs    []interface{}
 }
 
 func (ms *ModelsSuite) SetupSuite() {
 	ms.dbags = make(map[string][]byte)
+	ms.vs = []interface{}{
+		&quotaGetRequest{},
+		&QuotaSetRequest{},
+		&BucketRequest{},
+		&UserCreateRequest{},
+		&UserModifyRequest{},
+		&SubUserCreateRequest{},
+	}
 	datadir := os.Getenv("ADMINAPI_TEST_DATADIR")
 	if datadir == "" {
 		datadir = "./testdata"
@@ -38,7 +49,6 @@ func (ms *ModelsSuite) SetupSuite() {
 		if err != nil {
 			panic(fmt.Sprintf("Got error trying to read file %s: %s", path, err))
 		}
-
 	}
 
 }
@@ -85,6 +95,25 @@ func (ms *ModelsSuite) Test03Metadata() {
 	fmt.Printf("mbucket response:\n%#v\n", biresp)
 }
 
+func (ms *ModelsSuite) Test04Validators() {
+	var structName string
+	defer func() {
+		if r := recover(); r != nil {
+			ms.Fail("Paniced in Validators()", "paniced validating %s: %#v\n", structName, r)
+
+		}
+	}()
+	for _, v := range ms.vs {
+		structName = reflect.TypeOf(v).Elem().Name()
+		err := validate.Struct(v)
+		if err != nil {
+			vierr, ok := err.(*validator.InvalidValidationError)
+			ms.False(ok, "Error is InvalidValidationError %s", vierr)
+		}
+	}
+}
+
 func TestAdminAPI(t *testing.T) {
 	suite.Run(t, new(ModelsSuite))
+
 }

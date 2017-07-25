@@ -10,7 +10,7 @@ type quotaGetRequest struct {
 }
 
 type QuotaSetRequest struct {
-	UID            string `url:"uid" validate:"nonzero"`
+	UID            string `url:"uid" validate:"required"`
 	QuotaType      string `url:"quota-type" validate:"eq=user|eq=bucket"`
 	MaximumObjects int    `url:"max-objects,omitempty"`
 	MaximumSizeKb  int    `url:"max-size-kb,omitempty"`
@@ -19,8 +19,8 @@ type QuotaSetRequest struct {
 
 type QuotaMeta struct {
 	Enabled    bool  `json:"enabled"`
-	MaxSizeKb  int64 `json:max_size_kb"`
-	MaxObjects int64 `json:max_objects"`
+	MaxSizeKb  int64 `json:"max_size_kb"`
+	MaxObjects int64 `json:"max_objects"`
 }
 
 type Quotas struct {

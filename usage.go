@@ -6,7 +6,7 @@ import (
 
 // UsageRequest - desribes a usage request
 type UsageRequest struct {
-	UID         string    `url:"uid,omitempty"`
+	UID         string    `url:"uid,omitempty" validation:"required"`
 	Start       RadosTime `url:"start,omitempty"`
 	End         RadosTime `url:"end,omitempty"`
 	ShowEntries bool      `url:"show-entries,omitempty"`

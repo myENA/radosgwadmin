@@ -42,7 +42,7 @@ type UserCreateRequest struct {
 
 // UserModifyRequest - modify user request type.
 type UserModifyRequest struct {
-	UID         string   `url:"uid" validate:"nonzero"`
+	UID         string   `url:"uid" validate:"required"`
 	DisplayName string   `url:"display-name,omitempty"`
 	Email       string   `url:"email,omitempty"`
 	KeyType     string   `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
@@ -86,11 +86,11 @@ func (uc UserCapability) String() string {
 
 // SubUserCreateRequest - Create sub user request.
 type SubUserCreateRequest struct {
-	UID            string `url:"uid"`
-	SubUser        string `url:"subuser"`
+	UID            string `url:"uid" validate:"required"`
+	SubUser        string `url:"subuser" validate:"required"`
 	SecretKey      string `url:"secret-key,omitempty"`
 	KeyType        string `url:"key-type,omitempty"`
-	Access         string `url:"access,omitempty"`
+	Access         string `url:"access,omitempty" validate:"omitempty,eq=read|eq=write|eq=readwrite|eq=full"`
 	GenerateSecret bool   `url:"generate-secret,omitempty"`
 }
 
