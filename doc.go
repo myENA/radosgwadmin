@@ -40,8 +40,5 @@ Input validation is provided by https://godoc.org/gopkg.in/go-playground/validat
 so some errors returned will be of type validator.ValidationErrors in the case of
 invalid input.
 
-The config struct would be a good candidate to be parsed by
-https://godoc.org/github.com/BurntSushi/toml
-
 */
 package radosgwadmin

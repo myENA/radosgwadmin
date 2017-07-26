@@ -234,9 +234,9 @@ type Config struct {
 }
 
 // Duration - this allows us to use a text representation of a duration and
-// have it parse correctly.  Used for BurntSushi toml decoder as an example,
-// since they didn't see fit to handle built-in time.Duration type for some
-// reason.
+// have it parse correctly.  The go standard library time.Duration does not
+// implement the TextUnmarshaller interface, so we have to do this workaround
+// in order for json.Unmarshal or external parsers like toml.Decode .
 type Duration time.Duration
 
 // UnmarshalText - this implements the TextUnmarshaller
