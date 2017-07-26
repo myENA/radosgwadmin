@@ -72,17 +72,19 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	tlsc := new(tls.Config)
 	tlsc.InsecureSkipVerify = cfg.InsecureSkipVerify
 
-	var cacert []byte
-	if cfg.CACertBundlePath != "" {
-		cacert, err = ioutil.ReadFile(cfg.CACertBundlePath)
+	var cacerts []byte
+	if len(cfg.CACertBundle) > 0 {
+		cacerts = cfg.CACertBundle
+	} else if cfg.CACertBundlePath != "" {
+		cacerts, err = ioutil.ReadFile(cfg.CACertBundlePath)
 		if err != nil {
 			return nil, fmt.Errorf("Cannot open ca cert bundle %s: %s", cfg.CACertBundlePath, err)
 		}
 	}
 
-	if len(cacert) != 0 {
+	if len(cacerts) > 0 {
 		bundle := x509.NewCertPool()
-		ok := bundle.AppendCertsFromPEM(cacert)
+		ok := bundle.AppendCertsFromPEM(cacerts)
 		if !ok {
 			return nil, fmt.Errorf("Invalid cert bundle")
 		}
@@ -218,13 +220,15 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 
 // Config - this configures an AdminAPI.
 //
-// Specify CACertBundlePath only if you want to override the system default
-// CA cert bundle.
+// Specify CACertBundlePath to load a bundle from disk to override the default.
+// Specify CACertBundle if you want embed the cacert bundle in PEMm format.
+// Specify one or the other.  If both are specified, CACertBundle is honored.
 type Config struct {
 	ClientTimeout      Duration
 	ServerURL          string
 	AdminPath          string
 	CACertBundlePath   string
+	CACertBundle       []byte
 	InsecureSkipVerify bool
 	ZoneName           string
 	AccessKeyID        string
