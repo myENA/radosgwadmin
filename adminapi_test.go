@@ -104,6 +104,11 @@ func (ms *ModelsSuite) Test03Bucket() {
 	ms.Equal(len(bir.NewObjects), 3, "length of NewObjects not 3")
 	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWMain.NumObjects, 9, "rgwmain num objects not as expected")
 	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWNone.SizeKb, 5, "rgwnone num objects not as expected")
+
+	bucketindjsonNoFix := ms.dbags["bucketindex_nofix"]
+	bir = &BucketIndexResponse{}
+	err = bir.decode(bytes.NewReader(bucketindjsonNoFix))
+	ms.NoError(err, "Error, could not read bucketindex_nofix")
 }
 
 func (ms *ModelsSuite) Test04Metadata() {
