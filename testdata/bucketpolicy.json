@@ -1,0 +1,52 @@
+{
+   "owner" : {
+      "display_name" : "David Mabry",
+      "id" : "dmabry"
+   },
+   "acl" : {
+      "acl_group_map" : [
+         {
+            "acl" : 1,
+            "group" : 1
+         }
+      ],
+      "acl_user_map" : [
+         {
+            "acl" : 15,
+            "user" : "dmabry"
+         }
+      ],
+      "grant_map" : [
+         {
+            "id" : "",
+            "grant" : {
+               "name" : "",
+               "permission" : {
+                  "flags" : 1
+               },
+               "type" : {
+                  "type" : 2
+               },
+               "email" : "",
+               "id" : "",
+               "group" : 1
+            }
+         },
+         {
+            "grant" : {
+               "permission" : {
+                  "flags" : 15
+               },
+               "name" : "David Mabry",
+               "group" : 0,
+               "id" : "dmabry",
+               "email" : "",
+               "type" : {
+                  "type" : 0
+               }
+            },
+            "id" : "dmabry"
+         }
+      ]
+   }
+}

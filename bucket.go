@@ -36,6 +36,16 @@ type bucketUnlinkRequest struct {
 	UID    string `url:"uid" validation:"required"`
 }
 
+type bucketObjectRmRequest struct {
+	Bucket string `url:"bucket" validation:"required"`
+	Object string `url:"object" validation:"required"`
+}
+
+type bucketPolicyRequest struct {
+	Bucket string `url:"bucket" validation:"required"`
+	Object string `url:"object,omitempty"`
+}
+
 // BucketIndexResponse - bucket index response struct
 type BucketIndexResponse struct {
 	NewObjects []string `json:"new_objects"`
@@ -109,6 +119,40 @@ type BucketQuota struct {
 	MaxObjects int  `json:"max_objects"`
 }
 
+// BucketPolicyResponse - response from a bucket policy call
+type BucketPolicyResponse struct {
+	Owner struct {
+		DisplayName string `json:"display_name"`
+		ID          string `json:"id"`
+	} `json:"owner"`
+	ACL struct {
+		ACLGroupMap []struct {
+			ACL   int `json:"acl"`
+			Group int `json:"group"`
+		} `json:"acl_group_map"`
+		ACLUserMap []struct {
+			ACL  int    `json:"acl"`
+			User string `json:"user"`
+		} `json:"acl_user_map"`
+
+		GrantMap []struct {
+			ID    string `json:"id"`
+			Grant struct {
+				Name       string `json:"name"`
+				Permission struct {
+					Flags int `json:"flags"`
+				} `json:"permission"`
+				Type struct {
+					Type int `json:"type"`
+				} `json:"type"`
+				Email string `json:"email"`
+				ID    string `json:"id"`
+				Group int    `json:"group"`
+			} `json:"grant"`
+		} `json:"grant_map"`
+	}
+}
+
 // BucketList -
 //
 // return a list of all bucket names, optionally filtered by
@@ -163,4 +207,18 @@ func (aa *AdminAPI) BucketUnlink(ctx context.Context, bucket string, uid string)
 func (aa *AdminAPI) BucketLink(ctx context.Context, bucket, bucketID, uid string) error {
 	req := &bucketLinkRequest{Bucket: bucket, BucketID: bucketID, UID: uid}
 	return aa.put(ctx, "/bucket", req, nil, nil)
+}
+
+// BucketObjectRm - remove a bucket.  bucket must be non-empty string.
+func (aa *AdminAPI) BucketObjectRm(ctx context.Context, bucket, object string) error {
+	req := &bucketObjectRmRequest{Bucket: bucket, Object: object}
+	return aa.delete(ctx, "/bucket?object", req, nil)
+}
+
+// BucketPolicy - get a bucket policy.  bucket required, object is optional.
+func (aa *AdminAPI) BucketPolicy(ctx context.Context, bucket, object string) (*BucketPolicyResponse, error) {
+	req := bucketPolicyRequest{Bucket: bucket, Object: object}
+	resp := &BucketPolicyResponse{}
+	err := aa.get(ctx, "/bucket?policy", req, resp)
+	return resp, err
 }

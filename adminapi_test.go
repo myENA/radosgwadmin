@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	// "github.com/davecgh/go-spew/spew"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -36,6 +36,7 @@ func (ms *ModelsSuite) SetupSuite() {
 		&bucketLinkRequest{},
 		&bucketUnlinkRequest{},
 		&BucketIndexRequest{},
+		&bucketObjectRmRequest{},
 	}
 	datadir := os.Getenv("ADMINAPI_TEST_DATADIR")
 	if datadir == "" {
@@ -113,6 +114,12 @@ func (ms *ModelsSuite) Test03Bucket() {
 	bir = &BucketIndexResponse{}
 	err = bir.decode(bytes.NewReader(bucketindjsonNoFix))
 	ms.NoError(err, "Error, could not read bucketindex_nofix")
+
+	bucketpoljson := ms.dbags["bucketpolicy"]
+	bpr := &BucketPolicyResponse{}
+	err = json.Unmarshal(bucketpoljson, bpr)
+	ms.NoError(err, "Error, could not read from bucket policy")
+	spew.Dump(bpr)
 }
 
 func (ms *ModelsSuite) Test04Metadata() {
