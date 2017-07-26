@@ -92,7 +92,7 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 
 	aa.t.TLSClientConfig = tlsc
 	aa.c = &http.Client{
-		Timeout:   cfg.ClientTimeout.Duration,
+		Timeout:   time.Duration(cfg.ClientTimeout),
 		Transport: aa.t,
 	}
 	aa.creds = &awsauth.Credentials{
@@ -198,24 +198,22 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode != 200 {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("Invalid status code %d : %s : body: %s", resp.StatusCode, resp.Status, string(body))
 	}
-	if responseBody == nil {
+	if isNil(responseBody) {
 		return nil
 	}
 
-	if !isNil(responseBody) {
-
-		if cd, ok := responseBody.(customDecoder); ok {
-			return cd.decode(resp.Body)
-		}
-		d := json.NewDecoder(resp.Body)
-		return d.Decode(responseBody)
+	if cd, ok := responseBody.(customDecoder); ok {
+		return cd.decode(resp.Body)
 	}
-	return nil
+
+	return json.NewDecoder(resp.Body).Decode(responseBody)
 }
 
 // Config - this configures an AdminAPI.
@@ -235,19 +233,24 @@ type Config struct {
 	Expiration         time.Time
 }
 
-// Duration - this allows us to use a text representation
-// of a duration and have it parse correctly.  Used for
-// BurntSushi toml decoder, since they didn't see fit to
-// handle built-in time.Duration type for some reason.
-type Duration struct {
-	time.Duration
-}
+// Duration - this allows us to use a text representation of a duration and
+// have it parse correctly.  Used for BurntSushi toml decoder as an example,
+// since they didn't see fit to handle built-in time.Duration type for some
+// reason.
+type Duration time.Duration
 
 // UnmarshalText - this implements the TextUnmarshaller
 func (d *Duration) UnmarshalText(text []byte) error {
-	var err error
-	d.Duration, err = time.ParseDuration(string(text))
-	return err
+	var (
+		dur time.Duration
+		err error
+	)
+	dur, err = time.ParseDuration(string(text))
+	if err != nil {
+		return err
+	}
+	*d = Duration(dur)
+	return nil
 }
 
 // HTTPClient return the underlying http.Client

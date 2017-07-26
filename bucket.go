@@ -32,11 +32,16 @@ type BucketIndexResponse struct {
 // Implements the customDecoder interface
 func (bir *BucketIndexResponse) decode(data io.Reader) error {
 	// rgw does some weird shit with this response.
+	// has an array followed by a json object, no delimters.
 	dec := json.NewDecoder(data)
+
+	// Read the array first.
 	err := dec.Decode(&bir.NewObjects)
 	if err != nil {
 		return err
 	}
+
+	// Now read the object.
 	if dec.More() {
 		err = dec.Decode(&bir.Headers)
 		if err != nil {

@@ -61,6 +61,7 @@ func (is *IntegrationsSuite) SetupSuite() {
 
 	cfg := &IntegrationConfig{}
 	_, err = toml.Decode(string(cfgFile), cfg)
+
 	if err != nil {
 		log.Fatalf("cannot parse config file at location '%s' : %s", cfgFile, err)
 	}
