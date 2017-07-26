@@ -4,7 +4,7 @@
     Readtimeout = "120s"
     WriteTimeout = "120s"
 
-[adminapi]
+[rgw]
     ClientTimeout = "120s"
     ServerURL = "https://whatever.com"
     AdminPath = "admin"

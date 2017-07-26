@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"strings"
 
-	adminapi "bitbucket.ena.net/go/radosgwadmin"
+	rgw "bitbucket.ena.net/go/radosgwadmin"
 	"github.com/BurntSushi/toml"
 	"github.com/smartystreets/go-aws-auth"
 )
@@ -36,16 +36,16 @@ func main() {
 		log.Fatalf("Could not parse config file: %s", err)
 	}
 
-	if cfg.Server == nil || cfg.AdminAPI == nil {
-		log.Fatalf("Need to specify both [server] and [adminapi] sections of config")
+	if cfg.Server == nil || cfg.RGW == nil {
+		log.Fatalf("Need to specify both [server] and [rgw] sections of config")
 	}
 
-	target, err := url.Parse(cfg.AdminAPI.ServerURL)
+	target, err := url.Parse(cfg.RGW.ServerURL)
 	if err != nil {
-		log.Fatalf("Could not parse URL: %s", cfg.AdminAPI.ServerURL)
+		log.Fatalf("Could not parse URL: %s", cfg.RGW.ServerURL)
 	}
 
-	aa, err := adminapi.NewAdminAPI(cfg.AdminAPI)
+	aa, err := rgw.NewAdminAPI(cfg.RGW)
 	if err != nil {
 		log.Fatalf("Could not initialize admin api: %s", err)
 	}
@@ -68,10 +68,10 @@ func NewProxy(target *url.URL, cfg *Config, transport http.RoundTripper) *Proxy 
 	p.target = target
 	p.cfg = cfg
 	p.creds = awsauth.Credentials{
-		AccessKeyID:     cfg.AdminAPI.AccessKeyID,
-		SecretAccessKey: cfg.AdminAPI.SecretAccessKey,
-		SecurityToken:   cfg.AdminAPI.SecurityToken,
-		Expiration:      cfg.AdminAPI.Expiration,
+		AccessKeyID:     cfg.RGW.AccessKeyID,
+		SecretAccessKey: cfg.RGW.SecretAccessKey,
+		SecurityToken:   cfg.RGW.SecurityToken,
+		Expiration:      cfg.RGW.Expiration,
 	}
 	p.proxy = new(httputil.ReverseProxy)
 	p.proxy.Transport = transport
@@ -85,7 +85,6 @@ func (p *Proxy) Director(req *http.Request) {
 	req.URL.Scheme = target.Scheme
 	req.URL.Host = p.target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-	// _ = awsauth.Sign4(req, p.cfg.AdminAPI.Credentials)
 	_ = awsauth.SignS3(req, p.creds)
 	req.Header.Set("Host", target.Host)
 	if targetQuery == "" || req.URL.RawQuery == "" {
@@ -114,15 +113,15 @@ var (
 )
 
 type Config struct {
-	Server   *ServerConfig
-	AdminAPI *adminapi.Config
+	Server *ServerConfig
+	RGW    *rgw.Config
 }
 
 type ServerConfig struct {
 	ServiceHost  string
 	ServicePort  int
-	ReadTimeout  adminapi.Duration
-	WriteTimeout adminapi.Duration
+	ReadTimeout  rgw.Duration
+	WriteTimeout rgw.Duration
 }
 
 func init() {

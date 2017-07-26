@@ -26,7 +26,7 @@ type IntegrationsSuite struct {
 
 type IntegrationConfig struct {
 	Integration *Integration
-	AdminAPI    *Config
+	RGW         *Config
 }
 
 type Integration struct {
@@ -65,7 +65,7 @@ func (is *IntegrationsSuite) SetupSuite() {
 	if err != nil {
 		log.Fatalf("cannot parse config file at location '%s' : %s", cfgFile, err)
 	}
-	is.aa, err = NewAdminAPI(cfg.AdminAPI)
+	is.aa, err = NewAdminAPI(cfg.RGW)
 	if err != nil {
 		log.Fatalf("Error initializing AdminAPI: %s", err)
 	}
