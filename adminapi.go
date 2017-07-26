@@ -240,21 +240,26 @@ type Config struct {
 // Duration - this allows us to use a text representation of a duration and
 // have it parse correctly.  The go standard library time.Duration does not
 // implement the TextUnmarshaller interface, so we have to do this workaround
-// in order for json.Unmarshal or external parsers like toml.Decode .
+// in order for json.Unmarshal or external parsers like toml.Decode to work
+// with human friendly input.
 type Duration time.Duration
 
-// UnmarshalText - this implements the TextUnmarshaller
+// UnmarshalText - this implements the TextUnmarshaler
 func (d *Duration) UnmarshalText(text []byte) error {
-	var (
-		dur time.Duration
-		err error
-	)
-	dur, err = time.ParseDuration(string(text))
+	if len(text) == 0 {
+		return nil
+	}
+	dur, err := time.ParseDuration(string(text))
 	if err != nil {
 		return err
 	}
 	*d = Duration(dur)
 	return nil
+}
+
+// MarshalText - this implements TextMarshaler
+func (d Duration) MarshalText() ([]byte, error) {
+	return []byte(time.Duration(d).String()), nil
 }
 
 // HTTPClient return the underlying http.Client
