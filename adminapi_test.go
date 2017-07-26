@@ -28,10 +28,14 @@ func (ms *ModelsSuite) SetupSuite() {
 	ms.vs = []interface{}{
 		&quotaGetRequest{},
 		&QuotaSetRequest{},
-		&BucketRequest{},
 		&UserCreateRequest{},
 		&UserModifyRequest{},
 		&SubUserCreateModifyRequest{},
+		&bucketRequest{},
+		&bucketRmRequest{},
+		&bucketLinkRequest{},
+		&bucketUnlinkRequest{},
+		&BucketIndexRequest{},
 	}
 	datadir := os.Getenv("ADMINAPI_TEST_DATADIR")
 	if datadir == "" {

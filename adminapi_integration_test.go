@@ -132,7 +132,7 @@ func (is *IntegrationsSuite) Test04Quota() {
 }
 
 func (is *IntegrationsSuite) Test05Bucket() {
-	bucketnames, err := is.aa.BucketList(context.Background(), "", "")
+	bucketnames, err := is.aa.BucketList(context.Background(), "")
 	is.NoError(err, "Got error fetching bucket names")
 	fmt.Printf("bucket names: %#v\n", bucketnames)
 	bucketstats, err := is.aa.BucketStats(context.Background(), "", "")

@@ -6,8 +6,8 @@ import (
 	"io"
 )
 
-// BucketRequest - bucket request struct
-type BucketRequest struct {
+// bucketRequest - bucket request struct
+type bucketRequest struct {
 	Bucket string `url:"bucket,omitempty"`
 	UID    string `url:"uid,omitempty"`
 	Stats  bool   `url:"stats,omitempty"`
@@ -20,12 +20,32 @@ type BucketIndexRequest struct {
 	Fix          bool   `url:"fix,omitempty"`
 }
 
+type bucketRmRequest struct {
+	Bucket       string `url:"bucket" validation:"required"`
+	PurgeObjects bool   `url:"purge-objects"`
+}
+
+type bucketLinkRequest struct {
+	Bucket   string `url:"bucket" validation:"required"`
+	BucketID string `url:"bucket-id" validation:"required"`
+	UID      string `url:"uid" validation:"required"`
+}
+
+type bucketUnlinkRequest struct {
+	Bucket string `url:"bucket" validation:"required"`
+	UID    string `url:"uid" validation:"required"`
+}
+
 // BucketIndexResponse - bucket index response struct
 type BucketIndexResponse struct {
 	NewObjects []string `json:"new_objects"`
 	Headers    struct {
-		ExistingHeader   *BucketUsage `json:"existing_header,omitempty"`
-		CalculatedHeader *BucketUsage `json:"calculated_header,omitempty"`
+		ExistingHeader struct {
+			Usage BucketUsage `json:"usage"`
+		} `json:"existing_header,omitempty"`
+		CalculatedHeader struct {
+			Usage BucketUsage `json:"calculated_header,omitempty"`
+		}
 	} `json:"headers"`
 }
 
@@ -51,14 +71,12 @@ func (bir *BucketIndexResponse) decode(data io.Reader) error {
 	return nil
 }
 
-// BucketUsage - bucket usage collection
+// BucketUsage - Bucket usage entries
 type BucketUsage struct {
-	Usage struct {
-		RGWNone      *BucketUsageEntry `json:"rgw.none,omitempty"`
-		RGWMain      *BucketUsageEntry `json:"rgw.main,omitempty"`
-		RGWShadow    *BucketUsageEntry `json:"rgw.shadow,omitempty"`
-		RGWMultiMeta *BucketUsageEntry `json:"rgw.multimeta,omitempty"`
-	} `json:"usage"`
+	RGWNone      *BucketUsageEntry `json:"rgw.none,omitempty"`
+	RGWMain      *BucketUsageEntry `json:"rgw.main,omitempty"`
+	RGWShadow    *BucketUsageEntry `json:"rgw.shadow,omitempty"`
+	RGWMultiMeta *BucketUsageEntry `json:"rgw.multimeta,omitempty"`
 }
 
 // BucketUsageEntry - entry for each bucket usage bit.
@@ -70,18 +88,18 @@ type BucketUsageEntry struct {
 
 // BucketStatsResponse - bucket stats response type
 type BucketStatsResponse struct {
-	Bucket      string                      `json:"bucket"`
-	Pool        string                      `json:"pool"`
-	IndexPool   string                      `json:"index_pool"`
-	ID          string                      `json:"id"`
-	Marker      string                      `json:"marker"`
-	Owner       string                      `json:"owner"`
-	Ver         string                      `json:"ver"`
-	MasterVer   string                      `json:"master_ver"`
-	Mtime       RadosTime                   `json:"mtime"`
-	MaxMarker   string                      `json:"max_marker"`
-	Usage       map[string]BucketUsageEntry `json:"usage"`
-	BucketQuota *BucketQuota                `json:"bucket_quota"`
+	Bucket      string       `json:"bucket"`
+	Pool        string       `json:"pool"`
+	IndexPool   string       `json:"index_pool"`
+	ID          string       `json:"id"`
+	Marker      string       `json:"marker"`
+	Owner       string       `json:"owner"`
+	Ver         string       `json:"ver"`
+	MasterVer   string       `json:"master_ver"`
+	Mtime       RadosTime    `json:"mtime"`
+	MaxMarker   string       `json:"max_marker"`
+	Usage       BucketUsage  `json:"usage"`
+	BucketQuota *BucketQuota `json:"bucket_quota"`
 }
 
 // BucketQuota - bucket quota metadata
@@ -94,11 +112,11 @@ type BucketQuota struct {
 // BucketList -
 //
 // return a list of all bucket names, optionally filtered by
-// uid and bucket name
-func (aa *AdminAPI) BucketList(ctx context.Context, uid string, bucket string) ([]string, error) {
-	breq := &BucketRequest{
+// uid
+func (aa *AdminAPI) BucketList(ctx context.Context, uid string) ([]string, error) {
+	breq := &bucketRequest{
 		UID:    uid,
-		Bucket: bucket,
+		Bucket: "",
 		Stats:  false,
 	}
 	resp := []string{}
@@ -111,7 +129,7 @@ func (aa *AdminAPI) BucketList(ctx context.Context, uid string, bucket string) (
 // return a list of all bucket stats, optionally filtered by
 // uid and bucket name
 func (aa *AdminAPI) BucketStats(ctx context.Context, uid string, bucket string) ([]BucketStatsResponse, error) {
-	breq := &BucketRequest{
+	breq := &bucketRequest{
 		UID:    uid,
 		Bucket: bucket,
 		Stats:  true,
@@ -126,4 +144,23 @@ func (aa *AdminAPI) BucketIndex(ctx context.Context, bireq *BucketIndexRequest) 
 	resp := &BucketIndexResponse{}
 	err := aa.get(ctx, "/bucket?index", bireq, resp)
 	return resp, err
+}
+
+// BucketRm - remove a bucket.  bucket must be non-empty string.
+func (aa *AdminAPI) BucketRm(ctx context.Context, bucket string, purge bool) error {
+	req := &bucketRmRequest{Bucket: bucket, PurgeObjects: purge}
+	return aa.delete(ctx, "/bucket", req, nil)
+}
+
+// BucketUnlink - unlink a bucket from a user.  All parameters required.
+func (aa *AdminAPI) BucketUnlink(ctx context.Context, bucket string, uid string) error {
+	req := &bucketUnlinkRequest{Bucket: bucket, UID: uid}
+	return aa.post(ctx, "/bucket", req, nil, nil)
+}
+
+// BucketLink - link a bucket to a user, removing any previous links.  All
+// parameters required.
+func (aa *AdminAPI) BucketLink(ctx context.Context, bucket, bucketID, uid string) error {
+	req := &bucketLinkRequest{Bucket: bucket, BucketID: bucketID, UID: uid}
+	return aa.put(ctx, "/bucket", req, nil, nil)
 }
