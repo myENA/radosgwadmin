@@ -1,3 +1,7 @@
+[![Mozilla Public License](https://img.shields.io/badge/license-MPL-blue.svg)](https://www.mozilla.org/MPL)
+[![Go Report Card](https://goreportcard.com/badge/github.com/myENA/radosgwadmin)](https://goreportcard.com/report/github.com/myENA/radosgwadmin)
+[![GoDoc](https://godoc.org/github.com/myENA/radosgwadmin?status.svg)](https://godoc.org/github.com/myENA/radosgwadmin)
+
 Package radosgwadmin wraps http://docs.ceph.com/docs/master/radosgw/adminops
 
 Additionally, exposes some undocumented metadata operations (methods starting with 'M').
