@@ -241,16 +241,12 @@ func (aa *AdminAPI) validate(i interface{}) error {
 				} else if matches := altMatch.FindAllStringSubmatch(ferr.ActualTag(), -1); len(matches) > 0 {
 					valids := make([]string, len(matches))
 					for i := 0; i < len(matches); i++ {
-						if reflect.TypeOf(ferr.Value()).Kind() == reflect.String {
-							valids[i] = "\"" + matches[i][1] + "\""
-						} else {
-							valids[i] = matches[i][1]
-						}
+						valids[i] = "\"" + matches[i][1] + "\""
 					}
 					errs = append(errs,
 						fmt.Sprintf("Field '%s' invalid value: '%s', valid values are: %s",
 							ferr.StructNamespace(),
-							ferr.Value(),
+							ferr.Value(), // for now all are string - revise this if other types are needed
 							strings.Join(valids, ",")),
 					)
 				}

@@ -91,9 +91,9 @@ type BucketUsage struct {
 
 // BucketUsageEntry - entry for each bucket usage bit.
 type BucketUsageEntry struct {
-	SizeKb       int `json:"size_kb"`
-	SizeKbActual int `json:"size_kb_actual"`
-	NumObjects   int `json:"num_objects"`
+	SizeKb       int64 `json:"size_kb"`
+	SizeKbActual int64 `json:"size_kb_actual"`
+	NumObjects   int64 `json:"num_objects"`
 }
 
 // BucketStatsResponse - bucket stats response type
@@ -114,9 +114,9 @@ type BucketStatsResponse struct {
 
 // BucketQuota - bucket quota metadata
 type BucketQuota struct {
-	Enabled    bool `json:"enabled"`
-	MaxSizeKb  int  `json:"max_size_kb"`
-	MaxObjects int  `json:"max_objects"`
+	Enabled    bool  `json:"enabled"`
+	MaxSizeKb  int64 `json:"max_size_kb"`
+	MaxObjects int64 `json:"max_objects"`
 }
 
 // BucketPolicyResponse - response from a bucket policy call

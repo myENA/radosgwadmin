@@ -41,6 +41,7 @@ type userDeleteRequest struct {
 	PurgeData bool   `url:"purge-data"`
 }
 
+// UserCapsRequest - this is passed to CapsAdd() and CapsRm()
 type UserCapsRequest struct {
 	UID      string    `url:"uid" validate:"required"`
 	UserCaps []UserCap `url:"user-caps,semicolon" validate:"required,dive"`
@@ -152,4 +153,26 @@ func (aa *AdminAPI) SubUserModify(ctx context.Context, sucr *SubUserCreateModify
 // SubUserRm - delete a subuser
 func (aa *AdminAPI) SubUserRm(ctx context.Context, surm *SubUserRmRequest) error {
 	return aa.delete(ctx, "/user?subuser", surm, nil)
+}
+
+// CapsAdd - Add capabilities / permissions.  Returns the new effective capabilities.
+//
+// Note - capabilities are additive.  This will only ever make a user's permissions
+// more permissive.  As an example, if the user has metadata permission of *, calling
+// this with metadata set to read will have no effect.  On the other hand, if a user's
+// permission was read, and CapsAdd was called with write, the new effective permission
+// would be read + write (*).  To remove permissions, you must call CapsRm(), which is
+// subtractive.
+func (aa *AdminAPI) CapsAdd(ctx context.Context, ucr *UserCapsRequest) ([]UserCap, error) {
+	resp := []UserCap{}
+	err := aa.put(ctx, "/user?caps", ucr, nil, &resp)
+	return resp, err
+}
+
+// CapsRm - Remove capabilities / permissions.  Returns the new effective capabilities.
+// See notes for CapsAdd().
+func (aa *AdminAPI) CapsRm(ctx context.Context, ucr *UserCapsRequest) ([]UserCap, error) {
+	resp := []UserCap{}
+	err := aa.delete(ctx, "/user?caps", ucr, &resp)
+	return resp, err
 }

@@ -97,7 +97,7 @@ func (is *IntegrationsSuite) Test03UserCreate() {
 	ur.UID = "testuser"
 	ur.Email = "test.user@asdf.org"
 	ur.DisplayName = "Test User"
-	ur.UserCaps = UserCaps{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
+	ur.UserCaps = []UserCap{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
 
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
@@ -153,7 +153,51 @@ func (is *IntegrationsSuite) Test05Bucket() {
 
 }
 
-func (is *IntegrationsSuite) Test05RmUser() {
+func (is *IntegrationsSuite) Test06Caps() {
+	ucr := &UserCapsRequest{
+		UID:      "testuser",
+		UserCaps: []UserCap{{"usage", "read"}},
+	}
+	newcaps, err := is.aa.CapsAdd(context.Background(), ucr)
+	is.NoError(err, "Unexpected error adding capabilities")
+	is.Len(newcaps, 4, "unexpected len")
+	found := false
+	for _, cap := range newcaps {
+		if cap.String() == "usage=read" {
+			found = true
+			break
+		}
+	}
+	is.True(found, "could not find the permission we just added")
+	ucr.UserCaps = []UserCap{{"usage", "write"}}
+
+	found = false
+	newcaps, err = is.aa.CapsAdd(context.Background(), ucr)
+	is.NoError(err, "unexpected error")
+	for _, cap := range newcaps {
+		if cap.String() == "usage=*" {
+			found = true
+			break
+		}
+	}
+	is.True(found, "Permissions are not additive like we thought")
+
+	ucr.UserCaps = []UserCap{{"usage", "write"}, {"metadata", "write"}}
+
+	newcaps, err = is.aa.CapsRm(context.Background(), ucr)
+	is.NoError(err, "unexpected error")
+	goodct := 0
+	for _, caps := range newcaps {
+		switch caps.String() {
+		case "metadata=read", "usage=read":
+			goodct++
+		}
+	}
+	is.Equal(goodct, 2, "not expected removal of perms")
+
+}
+
+func (is *IntegrationsSuite) Test07RmUser() {
 	err := is.aa.UserRm(context.Background(), "testuser", true)
 	is.NoError(err, "got error removing user")
 	users, err := is.aa.MListUsers(context.Background())
