@@ -12,8 +12,8 @@ import (
 	"net/url"
 	"strings"
 
-	rgw "github.com/myENA/radosgwadmin"
 	"github.com/BurntSushi/toml"
+	rgw "github.com/myENA/radosgwadmin"
 	"github.com/smartystreets/go-aws-auth"
 )
 
@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("Got error opening config file: %s", err)
 	}
 
-	cfg := &Config{}
+	cfg := &config{}
 	_, err = toml.Decode(string(cfgFile), cfg)
 
 	if err != nil {
@@ -50,21 +50,21 @@ func main() {
 		log.Fatalf("Could not initialize admin api: %s", err)
 	}
 
-	p := NewProxy(target, cfg, aa.HTTPClient().Transport)
+	p := newProxy(target, cfg, aa.HTTPClient().Transport)
 	http.HandleFunc("/", p.proxy.ServeHTTP)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Server.ServiceHost, cfg.Server.ServicePort), nil)
 
 }
 
-type Proxy struct {
+type proxy struct {
 	target *url.URL
 	proxy  *httputil.ReverseProxy
-	cfg    *Config
+	cfg    *config
 	creds  awsauth.Credentials
 }
 
-func NewProxy(target *url.URL, cfg *Config, transport http.RoundTripper) *Proxy {
-	p := new(Proxy)
+func newProxy(target *url.URL, cfg *config, transport http.RoundTripper) *proxy {
+	p := new(proxy)
 	p.target = target
 	p.cfg = cfg
 	p.creds = awsauth.Credentials{
@@ -75,11 +75,11 @@ func NewProxy(target *url.URL, cfg *Config, transport http.RoundTripper) *Proxy 
 	}
 	p.proxy = new(httputil.ReverseProxy)
 	p.proxy.Transport = transport
-	p.proxy.Director = p.Director
+	p.proxy.Director = p.director
 	return p
 }
 
-func (p *Proxy) Director(req *http.Request) {
+func (p *proxy) director(req *http.Request) {
 	target := p.target
 	targetQuery := target.RawQuery
 	req.URL.Scheme = target.Scheme
@@ -112,12 +112,12 @@ var (
 	configFilePath string
 )
 
-type Config struct {
-	Server *ServerConfig
+type config struct {
+	Server *serverConfig
 	RGW    *rgw.Config
 }
 
-type ServerConfig struct {
+type serverConfig struct {
 	ServiceHost  string
 	ServicePort  int
 	ReadTimeout  rgw.Duration

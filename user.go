@@ -47,7 +47,7 @@ type UserCapsRequest struct {
 	UserCaps []UserCap `url:"user-caps,semicolon" validate:"required,dive"`
 }
 
-// UserInfoResponse - respone from a user info request.
+// UserInfoResponse - response from a user info request.
 type UserInfoResponse struct {
 	UserID      string     `json:"user_id"`
 	DisplayName string     `json:"display_name"`
