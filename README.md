@@ -11,7 +11,7 @@ Example app:
         "fmt"
         "time"
 
-        rgw "bitbucket.ena.net/go/radosgwadmin"
+        rgw "github.com/myENA/radosgwadmin"
     )
 
     func main() {
@@ -37,6 +37,4 @@ Example app:
     }
 ```
 
-Input validation is provided by https://godoc.org/gopkg.in/go-playground/validator.v9,
-so some errors returned will be of type validator.ValidationErrors in the case of
-invalid input.
+Input validation is provided by https://godoc.org/gopkg.in/go-playground/validator.v9

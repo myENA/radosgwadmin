@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"strings"
 
-	rgw "bitbucket.ena.net/go/radosgwadmin"
+	rgw "github.com/myENA/radosgwadmin"
 	"github.com/BurntSushi/toml"
 	"github.com/smartystreets/go-aws-auth"
 )

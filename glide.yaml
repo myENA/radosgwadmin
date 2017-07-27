@@ -1,4 +1,4 @@
-package: bitbucket.ena.net/go/radosgwadmin
+package: github.com/myENA/radosgwadmin
 import:
 - package: github.com/BurntSushi/toml
   version: ^0.2.0

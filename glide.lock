@@ -1,6 +1,8 @@
-hash: 8e1fd4a1b6c7a9cbe9aed4345a0222e2bf7ca9cc2cca922bcea92d929f4bcace
-updated: 2017-07-24T16:33:35.522306765-05:00
+hash: 6a3dba44f78b9164220126fbc78ebb209312a787439356412f847cc31b78eec3
+updated: 2017-07-27T14:44:40.558010012-05:00
 imports:
+- name: bitbucket.ena.net/go/radosgwadmin
+  version: 5073483824444c74697c724672c17f0c8e57fe34
 - name: github.com/BurntSushi/toml
   version: b26d9c308763d68093482582cea63d69be07a0f0
 - name: github.com/go-playground/locales
