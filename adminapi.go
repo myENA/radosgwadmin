@@ -234,7 +234,7 @@ func (aa *AdminAPI) validate(i interface{}) error {
 			for _, ferr := range verr {
 				if ferr.ActualTag() == "required" {
 					errs = append(errs,
-						fmt.Sprintf("Required field %s is is missing or empty",
+						fmt.Sprintf("Required field %s is missing or empty",
 							ferr.StructField(),
 						),
 					)
