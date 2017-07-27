@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -25,6 +26,8 @@ var tz *time.Location
 var falsch = false
 
 var validate *validator.Validate
+
+var altMatch = regexp.MustCompile(`eq=([^=\|]+)`)
 
 func init() {
 	tz, _ = time.LoadLocation("Local") // Defaults to local
@@ -47,10 +50,11 @@ var FalseRef = &falsch
 
 // AdminAPI - admin api struct
 type AdminAPI struct {
-	c     *http.Client
-	u     *url.URL
-	t     *http.Transport
-	creds *awsauth.Credentials
+	c                  *http.Client
+	u                  *url.URL
+	t                  *http.Transport
+	creds              *awsauth.Credentials
+	rawValidatorErrors bool
 }
 
 type customDecoder interface {
@@ -149,7 +153,7 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 	path = strings.TrimLeft(path, "/")
 	url := aa.u.String() + "/" + path
 	if !isNil(queryStruct) {
-		err := validate.Struct(queryStruct)
+		err := aa.validate(queryStruct)
 		if err != nil {
 			return err
 		}
@@ -171,7 +175,7 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 
 	var bodyReader io.Reader
 	if !isNil(requestBody) {
-		err := validate.Struct(requestBody)
+		err := aa.validate(requestBody)
 		if err != nil {
 			return err
 		}
@@ -218,6 +222,46 @@ func (aa *AdminAPI) req(ctx context.Context, verb, path string, queryStruct, req
 	return json.NewDecoder(resp.Body).Decode(responseBody)
 }
 
+// make sense of the validator error types
+func (aa *AdminAPI) validate(i interface{}) error {
+	err := validate.Struct(i)
+	if err != nil {
+		if aa.rawValidatorErrors {
+			return err
+		}
+		if verr, ok := err.(validator.ValidationErrors); ok {
+			var errs []string
+			for _, ferr := range verr {
+				if ferr.ActualTag() == "required" {
+					errs = append(errs,
+						fmt.Sprintf("Required field %s is is missing or empty",
+							ferr.StructField(),
+						),
+					)
+				} else if matches := altMatch.FindAllStringSubmatch(ferr.ActualTag(), -1); len(matches) > 0 {
+					valids := make([]string, len(matches))
+					for i := 0; i < len(matches); i++ {
+						if reflect.TypeOf(ferr.Value()).Kind() == reflect.String {
+							valids[i] = "\"" + matches[i][1] + "\""
+						} else {
+							valids[i] = matches[i][1]
+						}
+					}
+					errs = append(errs,
+						fmt.Sprintf("Field '%s' invalid value: '%s', valid values are: %s",
+							ferr.StructNamespace(),
+							ferr.Value(),
+							strings.Join(valids, ",")),
+					)
+				}
+			}
+
+			return fmt.Errorf("Validation error: %s", strings.Join(errs, " ; "))
+		}
+	}
+	return err
+}
+
 // Config - this configures an AdminAPI.
 //
 // Specify CACertBundlePath to load a bundle from disk to override the default.
@@ -235,6 +279,7 @@ type Config struct {
 	SecretAccessKey    string
 	SecurityToken      string
 	Expiration         time.Time
+	RawValidatorErrors bool // If true, then no attempt to interpret validator errors will be made.
 }
 
 // Duration - this allows us to use a text representation of a duration and

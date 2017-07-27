@@ -21,6 +21,7 @@ type ModelsSuite struct {
 	suite.Suite
 	dbags map[string][]byte
 	vs    []interface{}
+	aa    *AdminAPI
 }
 
 func (ms *ModelsSuite) SetupSuite() {
@@ -29,6 +30,7 @@ func (ms *ModelsSuite) SetupSuite() {
 		&quotaGetRequest{},
 		&QuotaSetRequest{},
 		&UserCreateRequest{},
+		&UserCapsRequest{},
 		&UserModifyRequest{},
 		&SubUserCreateModifyRequest{},
 		&bucketRequest{},
@@ -58,6 +60,8 @@ func (ms *ModelsSuite) SetupSuite() {
 		}
 	}
 
+	ms.aa = &AdminAPI{}
+
 }
 
 func (ms *ModelsSuite) Test01Validators() {
@@ -76,6 +80,32 @@ func (ms *ModelsSuite) Test01Validators() {
 			ms.False(ok, "Error is InvalidValidationError %s", vierr)
 		}
 	}
+
+	// test the UserCreateRequest validators
+	ucr := &UserCreateRequest{
+		UID:     "whatever",
+		Email:   "asdf@asdf.org",
+		KeyType: "swift",
+		UserCaps: []UserCap{
+			{
+				Type:       "buckets",
+				Permission: "read,write",
+			},
+			{
+				Type:       "asdf",
+				Permission: "invalid",
+			},
+		},
+	}
+	err := validate.Struct(ucr)
+	ms.Error(err, "did not fail validation")
+	_, ok := err.(validator.ValidationErrors)
+	ms.True(ok, "not coerce to ValidationErrors")
+
+	err = ms.aa.validate(ucr)
+	ms.Error(err, "did not fail internal validation")
+	fmt.Printf("error returned was: %s\n", err)
+
 }
 
 func (ms *ModelsSuite) Test02Usage() {

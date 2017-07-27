@@ -4,13 +4,46 @@ import (
 	"context"
 )
 
+// UserCreateRequest - describes what to do in a user create operation.
+type UserCreateRequest struct {
+	UID         string    `url:"uid" validate:"required"`
+	DisplayName string    `url:"display-name" validate:"required"`
+	Email       string    `url:"email,omitempty" validate:"omitempty,email"`
+	KeyType     string    `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
+	AccessKey   string    `url:"access-key,omitempty"`
+	SecretKey   string    `url:"secret-key,omitempty"`
+	UserCaps    []UserCap `url:"user-caps,omitempty,semicolon" validate:"omitempty,dive"`
+	GenerateKey *bool     `url:"generate-key,omitempty"` // This defaults to true, preserving that behavior
+	MaxBuckets  int       `url:"max-buckets,omitempty"`
+	Suspended   bool      `url:"suspended,omitempty"`
+}
+
+// UserModifyRequest - modify user request type.
+type UserModifyRequest struct {
+	UID         string    `url:"uid" validate:"required"`
+	DisplayName string    `url:"display-name,omitempty"`
+	Email       string    `url:"email,omitempty"`
+	KeyType     string    `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
+	AccessKey   string    `url:"access-key,omitempty"`
+	SecretKey   string    `url:"secret-key,omitempty"`
+	UserCaps    []UserCap `url:"user-caps,omitempty,semicolon" validate:"omitempty,dive"`
+	GenerateKey bool      `url:"generate-key,omitempty"` // This defaults to false, preserving that behavior
+	MaxBuckets  int       `url:"max-buckets,omitempty"`
+	Suspended   bool      `url:"suspended,omitempty"`
+}
+
 type userInfoRequest struct {
-	UID string `url:"uid"`
+	UID string `url:"uid" validate:"required"`
 }
 
 type userDeleteRequest struct {
-	UID       string `url:"uid"`
+	UID       string `url:"uid" validate:"required"`
 	PurgeData bool   `url:"purge-data"`
+}
+
+type UserCapsRequest struct {
+	UID      string    `url:"uid" validate:"required"`
+	UserCaps []UserCap `url:"user-caps,semicolon" validate:"required,dive"`
 }
 
 // UserInfoResponse - respone from a user info request.
@@ -23,35 +56,7 @@ type UserInfoResponse struct {
 	SubUsers    []SubUser  `json:"subusers"`
 	Keys        []UserKey  `json:"keys"`
 	SwiftKeys   []SwiftKey `json:"swift_keys"`
-	Caps        UserCaps   `json:"caps"`
-}
-
-// UserCreateRequest - describes what to do in a user create operation.
-type UserCreateRequest struct {
-	UID         string   `url:"uid" validate:"required"`
-	DisplayName string   `url:"display-name"`
-	Email       string   `url:"email,omitempty" validate:"omitempty,email"`
-	KeyType     string   `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
-	AccessKey   string   `url:"access-key,omitempty"`
-	SecretKey   string   `url:"secret-key,omitempty"`
-	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
-	GenerateKey *bool    `url:"generate-key,omitempty"` // This defaults to true, preserving that behavior
-	MaxBuckets  int      `url:"max-buckets,omitempty"`
-	Suspended   bool     `url:"suspended,omitempty"`
-}
-
-// UserModifyRequest - modify user request type.
-type UserModifyRequest struct {
-	UID         string   `url:"uid" validate:"required"`
-	DisplayName string   `url:"display-name,omitempty"`
-	Email       string   `url:"email,omitempty"`
-	KeyType     string   `url:"key-type,omitempty" validate:"omitempty,eq=swift|eq=s3"`
-	AccessKey   string   `url:"access-key,omitempty"`
-	SecretKey   string   `url:"secret-key,omitempty"`
-	UserCaps    UserCaps `url:"user-caps,omitempty,semicolon"`
-	GenerateKey bool     `url:"generate-key,omitempty"` // This defaults to false, preserving that behavior
-	MaxBuckets  int      `url:"max-buckets,omitempty"`
-	Suspended   bool     `url:"suspended,omitempty"`
+	Caps        []UserCap  `json:"caps"`
 }
 
 // SubUser - describes a subuser
@@ -73,14 +78,14 @@ type SwiftKey struct {
 	SecretKey string `json:"secret_key"`
 }
 
-// UserCapability - desribes user capabilities / permissions.
-type UserCapability struct {
-	Type       string `json:"type" validate:"users|buckets|metadata|usage|zone"`
-	Permission string `json:"perm" enum:"*|read|write|read,write"`
+// UserCap - desribes user capabilities / permissions.
+type UserCap struct {
+	Type       string `json:"type" validate:"required,eq=users|eq=buckets|eq=metadata|eq=usage|eq=zone"`
+	Permission string `json:"perm" validate:"required,eq=*|eq=read|eq=write|eq=read0x2Cwrite"`
 }
 
-// Implement Stringer
-func (uc UserCapability) String() string {
+// String - Implement Stringer
+func (uc UserCap) String() string {
 	return uc.Type + "=" + uc.Permission
 }
 
@@ -100,9 +105,6 @@ type SubUserRmRequest struct {
 	SubUser   string `url:"subuser" validate:"required"`
 	PurgeKeys *bool  `url:"purge-keys,omitempty"` // Default true
 }
-
-// UserCaps - list of UserCapability
-type UserCaps []UserCapability
 
 // UserInfo - get user information about uid.
 func (aa *AdminAPI) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
