@@ -104,7 +104,7 @@ func (ms *ModelsSuite) Test01Validators() {
 
 	err = ms.aa.validate(ucr)
 	ms.Error(err, "did not fail internal validation")
-	fmt.Printf("error returned was: %s\n", err)
+	ms.T().Logf("error returned was: %s\n", err)
 
 }
 
@@ -128,8 +128,8 @@ func (ms *ModelsSuite) Test03Bucket() {
 	resp := &BucketStatsResponse{}
 	err := json.Unmarshal(bucketjson, resp)
 	ms.NoError(err, "Error unmarshaling bucket json")
-	fmt.Printf("bucket response:\n%#v\n", resp)
-	fmt.Printf("mktime: %s\n", time.Time(resp.Mtime).String())
+	ms.T().Logf("bucket response:\n%#v\n", resp)
+	ms.T().Logf("mktime: %s\n", time.Time(resp.Mtime).String())
 
 	bucketindjson := ms.dbags["bucketindex"]
 	bir := &BucketIndexResponse{}
@@ -149,7 +149,8 @@ func (ms *ModelsSuite) Test03Bucket() {
 	bpr := &BucketPolicyResponse{}
 	err = json.Unmarshal(bucketpoljson, bpr)
 	ms.NoError(err, "Error, could not read from bucket policy")
-	spew.Dump(bpr)
+
+	ms.T().Log(spew.Sdump(bpr))
 }
 
 func (ms *ModelsSuite) Test04Metadata() {
@@ -157,17 +158,17 @@ func (ms *ModelsSuite) Test04Metadata() {
 	bresp := &MBucketResponse{}
 	err := json.Unmarshal(bucketjson, bresp)
 	ms.NoError(err, "Error unmarshaling mbucket json")
-	fmt.Printf("mbucket response:\n%#v\n", bresp)
+	ms.T().Logf("mbucket response:\n%#v\n", bresp)
 	userjson := ms.dbags["muser"]
 	uresp := &MUserResponse{}
 	err = json.Unmarshal(userjson, uresp)
 	ms.NoError(err, "Error unmarshaling muser json")
-	fmt.Printf("muser response:\n%#v\n", uresp)
+	ms.T().Logf("muser response:\n%#v\n", uresp)
 	bucketinstjson := ms.dbags["mbucketinstance"]
 	biresp := &MBucketInstanceResponse{}
 	err = json.Unmarshal(bucketinstjson, biresp)
 	ms.NoError(err, "Error unmarshaling mbucketinst json")
-	fmt.Printf("mbucket response:\n%#v\n", biresp)
+	ms.T().Logf("mbucket response:\n%#v\n", biresp)
 }
 
 func (ms *ModelsSuite) Test05Quotas() {

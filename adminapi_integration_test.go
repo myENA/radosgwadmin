@@ -4,11 +4,7 @@ package radosgwadmin
 
 import (
 	"context"
-	"fmt"
-	// "io"
 	"io/ioutil"
-	"log"
-	// "math/rand"
 	"os"
 	"testing"
 
@@ -35,15 +31,6 @@ type Integration struct {
 
 func (is *IntegrationsSuite) SetupSuite() {
 
-	logPath := os.Getenv("ADMINAPI_TEST_LOGFILE")
-	if logPath != "" {
-		lf, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			panic(fmt.Sprintf("Could not open log file %s: %s", logPath, err))
-		}
-		log.SetOutput(lf)
-	}
-
 	datadir := os.Getenv("ADMINAPI_TEST_DATADIR")
 	if datadir == "" {
 		datadir = "./testdata"
@@ -56,18 +43,21 @@ func (is *IntegrationsSuite) SetupSuite() {
 
 	cfgFile, err := ioutil.ReadFile(cfgFilePath)
 	if err != nil {
-		log.Fatalf("Got error opening config file: %s", err)
+		is.T().Logf("Got error opening config file: %s", err)
+		os.Exit(1)
 	}
 
 	cfg := &IntegrationConfig{}
 	_, err = toml.Decode(string(cfgFile), cfg)
 
 	if err != nil {
-		log.Fatalf("cannot parse config file at location '%s' : %s", cfgFile, err)
+		is.T().Logf("cannot parse config file at location '%s' : %s", cfgFile, err)
+		os.Exit(1)
 	}
 	is.aa, err = NewAdminAPI(cfg.RGW)
 	if err != nil {
-		log.Fatalf("Error initializing AdminAPI: %s", err)
+		is.T().Logf("Error initializing AdminAPI: %s", err)
+		os.Exit(1)
 	}
 
 }
@@ -81,7 +71,7 @@ func (is *IntegrationsSuite) TearDownSuite() {
 func (is *IntegrationsSuite) Test01Usage() {
 	usage, err := is.aa.Usage(context.Background(), nil)
 	is.NoError(err, "Got error getting Usage")
-	log.Printf("usage: %#v", usage)
+	is.T().Logf("usage: %#v", usage)
 	err = is.aa.UsageTrim(context.Background(), &TrimUsageRequest{UID: "testuser"})
 	is.NoError(err, "Got error trimming usage")
 }
@@ -89,7 +79,7 @@ func (is *IntegrationsSuite) Test01Usage() {
 func (is *IntegrationsSuite) Test02Metadata() {
 	users, err := is.aa.MListUsers(context.Background())
 	is.NoError(err, "Got error running MListUsers()")
-	log.Printf("users: %#v", users)
+	is.T().Logf("users: %#v", users)
 }
 
 func (is *IntegrationsSuite) Test03UserCreate() {
@@ -101,7 +91,7 @@ func (is *IntegrationsSuite) Test03UserCreate() {
 
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
-	log.Printf("%#v", resp)
+	is.T().Logf("%#v", resp)
 	sur := new(SubUserCreateModifyRequest)
 	sur.UID = "testuser"
 	sur.Access = "full"
@@ -110,7 +100,7 @@ func (is *IntegrationsSuite) Test03UserCreate() {
 	sur.GenerateSecret = true
 	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
 	is.NoError(err)
-	log.Printf("%#v", nresp)
+	is.T().Logf("%#v", nresp)
 }
 
 func (is *IntegrationsSuite) Test04Quota() {
@@ -124,7 +114,7 @@ func (is *IntegrationsSuite) Test04Quota() {
 	is.NoError(err, "Got error running SetQuota")
 	// read it back
 	qresp, err := is.aa.QuotaUser(context.Background(), "testuser")
-	log.Printf("%#v", qresp)
+	is.T().Logf("%#v", qresp)
 	is.NoError(err, "Got error fetching user quota")
 	is.True(qresp.Enabled == true, "quota not enabled")
 	is.Equal(qresp.MaxObjects, int64(-1), "MaxObjects not -1")
@@ -134,11 +124,11 @@ func (is *IntegrationsSuite) Test04Quota() {
 func (is *IntegrationsSuite) Test05Bucket() {
 	bucketnames, err := is.aa.BucketList(context.Background(), "")
 	is.NoError(err, "Got error fetching bucket names")
-	fmt.Printf("bucket names: %#v\n", bucketnames)
+	is.T().Logf("bucket names: %#v\n", bucketnames)
 	bucketstats, err := is.aa.BucketStats(context.Background(), "", "")
 	is.NoError(err, "got error fetching bucket stats")
 
-	log.Print(spew.Sdump(bucketstats))
+	is.T().Log(spew.Sdump(bucketstats))
 
 	// TODO - make code that creates a bucket and does stuff to test
 	// bucket index code. -- for now, do one I know already exists
@@ -149,7 +139,7 @@ func (is *IntegrationsSuite) Test05Bucket() {
 	bireq.Fix = true
 	bucketindresp, err := is.aa.BucketIndex(context.Background(), bireq)
 	is.NoError(err, "Got error from BucketIndex()")
-	log.Printf(spew.Sdump(bucketindresp))
+	is.T().Logf(spew.Sdump(bucketindresp))
 
 }
 
