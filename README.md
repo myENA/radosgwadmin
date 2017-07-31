@@ -1,6 +1,7 @@
 [![Mozilla Public License](https://img.shields.io/badge/license-MPL-blue.svg)](https://www.mozilla.org/MPL)
 [![Go Report Card](https://goreportcard.com/badge/github.com/myENA/radosgwadmin)](https://goreportcard.com/report/github.com/myENA/radosgwadmin)
 [![GoDoc](https://godoc.org/github.com/myENA/radosgwadmin?status.svg)](https://godoc.org/github.com/myENA/radosgwadmin)
+[![Build Status](https://travis-ci.org/myENA/radosgwadmin.svg?branch=master)](https://travis-ci.org/myENA/radosgwadmin)
 
 Package radosgwadmin wraps http://docs.ceph.com/docs/master/radosgw/adminops
 
