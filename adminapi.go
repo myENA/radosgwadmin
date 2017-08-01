@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -72,7 +73,19 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 		return nil, err
 	}
 
-	aa.t = new(http.Transport)
+	aa.t = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+
 	tlsc := new(tls.Config)
 	tlsc.InsecureSkipVerify = cfg.InsecureSkipVerify
 
@@ -111,6 +124,7 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	if cfg.ZoneName != "" && tz.String() != cfg.ZoneName {
 		tz, err = time.LoadLocation(cfg.ZoneName)
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +317,8 @@ func (d Duration) MarshalText() ([]byte, error) {
 	return []byte(time.Duration(d).String()), nil
 }
 
-// HTTPClient return the underlying http.Client
+// HTTPClient return the underlying http.Client.  You can use this to fine tune
+// the http.Transport settings, for example.
 func (aa *AdminAPI) HTTPClient() *http.Client {
 	return aa.c
 }
