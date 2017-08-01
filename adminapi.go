@@ -53,7 +53,6 @@ var FalseRef = &falsch
 type AdminAPI struct {
 	c                  *http.Client
 	u                  *url.URL
-	t                  *http.Transport
 	creds              *awsauth.Credentials
 	rawValidatorErrors bool
 }
@@ -72,8 +71,8 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	aa.t = &http.Transport{
+	// Lifted from http package DefaultTransort.
+	t := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -109,11 +108,13 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 		tlsc.BuildNameToCertificate()
 	}
 
-	aa.t.TLSClientConfig = tlsc
+	t.TLSClientConfig = tlsc
+
 	aa.c = &http.Client{
 		Timeout:   time.Duration(cfg.ClientTimeout),
-		Transport: aa.t,
+		Transport: t,
 	}
+
 	aa.creds = &awsauth.Credentials{
 		AccessKeyID:     cfg.AccessKeyID,
 		SecretAccessKey: cfg.SecretAccessKey,
@@ -275,7 +276,7 @@ func (aa *AdminAPI) validate(i interface{}) error {
 // Config - this configures an AdminAPI.
 //
 // Specify CACertBundlePath to load a bundle from disk to override the default.
-// Specify CACertBundle if you want embed the cacert bundle in PEMm format.
+// Specify CACertBundle if you want embed the cacert bundle in PEM format.
 // Specify one or the other.  If both are specified, CACertBundle is honored.
 type Config struct {
 	ClientTimeout      Duration
@@ -299,7 +300,7 @@ type Config struct {
 // with human friendly input.
 type Duration time.Duration
 
-// UnmarshalText - this implements the TextUnmarshaler
+// UnmarshalText - this implements the TextUnmarshaler interface
 func (d *Duration) UnmarshalText(text []byte) error {
 	if len(text) == 0 {
 		return nil

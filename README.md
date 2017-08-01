@@ -7,6 +7,8 @@ Package radosgwadmin wraps http://docs.ceph.com/docs/master/radosgw/adminops
 
 Additionally, exposes some undocumented metadata operations (methods starting with 'M').
 
+Requires Go 1.7 or newer.
+
 Example app:
 ```go
     package main
