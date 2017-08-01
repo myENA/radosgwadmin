@@ -11,7 +11,7 @@ env:
   PATH=$HOME/bin:$PATH
   
 install:
-  - glide up
+  - glide install
 
 before_install:
   - wget "https://github.com/Masterminds/glide/releases/download/v$GLIDE_VER/glide-v$GLIDE_VER-linux-amd64.tar.gz"
