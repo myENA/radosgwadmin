@@ -1,3 +1,10 @@
+[integration]
+    TestUID = "integrationtests"
+    TestEmail = "integration@tests.com"
+    TestDisplayName = "Integration Test User"
+    TestSubUser = "testsubuser"
+    TestBucket = "testbucket"
+
 [rgw]
     ClientTimeout = "120s"
     ServerURL = "https://asdf.org/"

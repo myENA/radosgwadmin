@@ -18,6 +18,7 @@ type IntegrationsSuite struct {
 	aa           *AdminAPI
 	randFilePath string
 	lf           *os.File
+	i            *Integration
 }
 
 type IntegrationConfig struct {
@@ -26,7 +27,11 @@ type IntegrationConfig struct {
 }
 
 type Integration struct {
-	TestUID string
+	TestUID         string
+	TestEmail       string
+	TestDisplayName string
+	TestSubUser     string
+	TestBucket      string // needs to exist already
 }
 
 func (is *IntegrationsSuite) SetupSuite() {
@@ -55,6 +60,7 @@ func (is *IntegrationsSuite) SetupSuite() {
 		os.Exit(1)
 	}
 	is.aa, err = NewAdminAPI(cfg.RGW)
+	is.i = cfg.Integration
 	if err != nil {
 		is.T().Logf("Error initializing AdminAPI: %s", err)
 		os.Exit(1)
@@ -72,7 +78,7 @@ func (is *IntegrationsSuite) Test01Usage() {
 	usage, err := is.aa.Usage(context.Background(), nil)
 	is.NoError(err, "Got error getting Usage")
 	is.T().Logf("usage: %#v", usage)
-	err = is.aa.UsageTrim(context.Background(), &TrimUsageRequest{UID: "testuser"})
+	err = is.aa.UsageTrim(context.Background(), &TrimUsageRequest{UID: is.i.TestUID})
 	is.NoError(err, "Got error trimming usage")
 }
 
@@ -84,19 +90,19 @@ func (is *IntegrationsSuite) Test02Metadata() {
 
 func (is *IntegrationsSuite) Test03UserCreate() {
 	ur := new(UserCreateRequest)
-	ur.UID = "testuser"
-	ur.Email = "test.user@asdf.org"
-	ur.DisplayName = "Test User"
+	ur.UID = is.i.TestUID
+	ur.Email = is.i.TestEmail
+	ur.DisplayName = is.i.TestDisplayName
 	ur.UserCaps = []UserCap{{"users", "*"}, {"metadata", "*"}, {"buckets", "read"}}
 
 	resp, err := is.aa.UserCreate(context.Background(), ur)
 	is.NoError(err, "Got error running UserCreate")
 	is.T().Logf("%#v", resp)
 	sur := new(SubUserCreateModifyRequest)
-	sur.UID = "testuser"
+	sur.UID = is.i.TestUID
 	sur.Access = "full"
 	sur.KeyType = "s3"
-	sur.SubUser = "testsubuser"
+	sur.SubUser = is.i.TestSubUser
 	sur.GenerateSecret = true
 	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
 	is.NoError(err)
@@ -109,11 +115,11 @@ func (is *IntegrationsSuite) Test04Quota() {
 	qsr.MaximumObjects = -1 // unlimited
 	qsr.MaximumSizeKb = 8192
 	qsr.QuotaType = "user"
-	qsr.UID = "testuser"
+	qsr.UID = is.i.TestUID
 	err := is.aa.QuotaSet(context.Background(), qsr)
 	is.NoError(err, "Got error running SetQuota")
 	// read it back
-	qresp, err := is.aa.QuotaUser(context.Background(), "testuser")
+	qresp, err := is.aa.QuotaUser(context.Background(), is.i.TestUID)
 	is.T().Logf("%#v", qresp)
 	is.NoError(err, "Got error fetching user quota")
 	is.True(qresp.Enabled == true, "quota not enabled")
@@ -134,7 +140,7 @@ func (is *IntegrationsSuite) Test05Bucket() {
 	// bucket index code. -- for now, do one I know already exists
 
 	bireq := &BucketIndexRequest{}
-	bireq.Bucket = "muhbucket"
+	bireq.Bucket = is.i.TestBucket
 	bireq.CheckObjects = true
 	bireq.Fix = true
 	bucketindresp, err := is.aa.BucketIndex(context.Background(), bireq)
@@ -145,7 +151,7 @@ func (is *IntegrationsSuite) Test05Bucket() {
 
 func (is *IntegrationsSuite) Test06Caps() {
 	ucr := &UserCapsRequest{
-		UID:      "testuser",
+		UID:      is.i.TestUID,
 		UserCaps: []UserCap{{"usage", "read"}},
 	}
 	newcaps, err := is.aa.CapsAdd(context.Background(), ucr)
@@ -188,13 +194,13 @@ func (is *IntegrationsSuite) Test06Caps() {
 }
 
 func (is *IntegrationsSuite) Test07RmUser() {
-	err := is.aa.UserRm(context.Background(), "testuser", true)
+	err := is.aa.UserRm(context.Background(), is.i.TestUID, true)
 	is.NoError(err, "got error removing user")
 	users, err := is.aa.MListUsers(context.Background())
 	is.NoError(err, "got error listing users")
 	found := false
 	for _, user := range users {
-		if user == "testuser" {
+		if user == is.i.TestUID {
 			found = true
 			break
 		}

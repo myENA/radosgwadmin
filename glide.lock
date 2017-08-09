@@ -1,5 +1,5 @@
 hash: 6a3dba44f78b9164220126fbc78ebb209312a787439356412f847cc31b78eec3
-updated: 2017-07-31T22:27:33.246669709-05:00
+updated: 2017-08-09T10:52:19.120482373-05:00
 imports:
 - name: github.com/BurntSushi/toml
   version: b26d9c308763d68093482582cea63d69be07a0f0
@@ -22,7 +22,7 @@ imports:
   - require
   - suite
 - name: gopkg.in/go-playground/validator.v9
-  version: 0f6f568263a1ab5105b57f66f446d2625e4f545c
+  version: d529ee1b0f30352444f507cc6cdac96bfd12decc
 testImports:
 - name: github.com/davecgh/go-spew
   version: adab96458c51a58dc1783b3335dcce5461522e75
