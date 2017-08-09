@@ -7,7 +7,7 @@ Package radosgwadmin wraps http://docs.ceph.com/docs/master/radosgw/adminops
 
 Additionally, exposes some undocumented metadata operations (methods starting with 'M').
 
-Requires Go 1.7 or newer.
+Requires Go 1.7 or newer.  Tested with Jewel through Luminous releases of Ceph.
 
 Example app:
 ```go
