@@ -31,6 +31,7 @@ type Integration struct {
 	TestEmail       string
 	TestDisplayName string
 	TestSubUser     string
+	TesTSubUser2    string
 	TestBucket      string // needs to exist already
 }
 
@@ -105,6 +106,11 @@ func (is *IntegrationsSuite) Test03UserCreate() {
 	sur.SubUser = is.i.TestSubUser
 	sur.GenerateSecret = true
 	nresp, err := is.aa.SubUserCreate(context.Background(), sur)
+	is.NoError(err)
+	is.T().Logf("%#v", nresp)
+	sur.SubUser = is.i.TesTSubUser2
+	sur.Access = "read"
+	nresp, err = is.aa.SubUserCreate(context.Background(), sur)
 	is.NoError(err)
 	is.T().Logf("%#v", nresp)
 }
