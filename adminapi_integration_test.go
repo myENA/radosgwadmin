@@ -6,6 +6,7 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/BurntSushi/toml"
@@ -200,6 +201,14 @@ func (is *IntegrationsSuite) Test06Caps() {
 }
 
 func (is *IntegrationsSuite) Test07RmUser() {
+	leave := os.Getenv("LEAVE_USER")
+	if leave != "" {
+		l, _ := strconv.ParseBool(leave)
+		if l {
+			is.T().Log("Skipping user delete")
+			return
+		}
+	}
 	err := is.aa.UserRm(context.Background(), is.i.TestUID, true)
 	is.NoError(err, "got error removing user")
 	users, err := is.aa.MListUsers(context.Background())
