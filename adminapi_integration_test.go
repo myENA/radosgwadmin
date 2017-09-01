@@ -138,12 +138,17 @@ func (is *IntegrationsSuite) Test05Bucket() {
 	bucketnames, err := is.aa.BucketList(context.Background(), "")
 	is.NoError(err, "Got error fetching bucket names")
 	is.T().Logf("bucket names: %#v\n", bucketnames)
+	// bucketstats with no filters
 	bucketstats, err := is.aa.BucketStats(context.Background(), "", "")
 	is.NoError(err, "got error fetching bucket stats")
-
 	is.T().Log(spew.Sdump(bucketstats))
 
-	// TODO - make code that creates a bucket and does stuff to test
+	// bucketstats with bucket filter
+	bucketstatsf, err := is.aa.BucketStats(context.Background(), "", is.i.TestBucket)
+	is.NoError(err, "got error fetching bucket stats filtered by bucket")
+	is.T().Log(spew.Sdump(bucketstatsf))
+
+	// TODO: - make code that creates a bucket and does stuff to test
 	// bucket index code. -- for now, do one I know already exists
 
 	bireq := &BucketIndexRequest{}

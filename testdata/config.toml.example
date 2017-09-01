@@ -3,7 +3,7 @@
     TestEmail = "integration@tests.com"
     TestDisplayName = "Integration Test User"
     TestSubUser = "testsubuser"
-    TestSubUser = "testsubuser2"
+    TestSubUser2 = "testsubuser2"
     TestBucket = "testbucket"
 
 [rgw]
