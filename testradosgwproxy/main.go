@@ -84,9 +84,10 @@ func (p *proxy) director(req *http.Request) {
 	targetQuery := target.RawQuery
 	req.URL.Scheme = target.Scheme
 	req.URL.Host = p.target.Host
+	req.Host = target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-	_ = awsauth.SignS3(req, p.creds)
 	req.Header.Set("Host", target.Host)
+	_ = awsauth.SignS3(req, p.creds)
 	if targetQuery == "" || req.URL.RawQuery == "" {
 		req.URL.RawQuery = targetQuery + req.URL.RawQuery
 	} else {
