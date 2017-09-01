@@ -173,12 +173,18 @@ func (aa *AdminAPI) BucketList(ctx context.Context, uid string) ([]string, error
 // return a list of all bucket stats, optionally filtered by
 // uid and bucket name
 func (aa *AdminAPI) BucketStats(ctx context.Context, uid string, bucket string) ([]BucketStatsResponse, error) {
-	breq := &bucketRequest{
-		UID:    uid,
-		Bucket: bucket,
-		Stats:  true,
-	}
 	resp := []BucketStatsResponse{}
+	breq := &bucketRequest{
+		Stats: true,
+	}
+	if bucket != "" {
+		breq.Bucket = bucket
+		respB := BucketStatsResponse{}
+		err := aa.get(ctx, "/bucket", breq, &respB)
+		return append(resp, respB), err
+	}
+
+	breq.UID = uid
 	err := aa.get(ctx, "/bucket", breq, &resp)
 	return resp, err
 }
