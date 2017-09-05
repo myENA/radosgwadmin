@@ -205,7 +205,50 @@ func (is *IntegrationsSuite) Test06Caps() {
 
 }
 
-func (is *IntegrationsSuite) Test07RmUser() {
+func (is *IntegrationsSuite) Test07Keys() {
+	accessKey := "TESTACCESSKEY"
+	secretKey := "TESTSECRETKEY"
+	generateKey := false
+	kc := &KeyCreateRequest{
+		UID:         is.i.TestUID,
+		AccessKey:   accessKey,
+		SecretKey:   secretKey,
+		GenerateKey: &generateKey,
+	}
+
+	userKeys, err := is.aa.KeyCreate(context.Background(), kc)
+	is.NoError(err, "Unexpected error adding key")
+	found := false
+	for _, key := range userKeys {
+		if key.AccessKey == accessKey && key.SecretKey == secretKey {
+			found = true
+			break
+		}
+	}
+	is.True(found, "could not find the key we just added")
+
+	// now try to remove the key
+	kr := &KeyRmRequest{
+		AccessKey: accessKey,
+	}
+
+	err1 := is.aa.KeyRm(context.Background(), kr)
+	is.NoError(err1, "Unexpected error deleting key")
+
+	// check if the key was really deleted
+	userInfo, err2 := is.aa.UserInfo(context.Background(), is.i.TestUID)
+	is.NoError(err2, "Unexpected error reading user info")
+	found = false
+	for i := range userInfo.Keys {
+		if ok := userInfo.Keys[i].AccessKey == accessKey; ok {
+			found = true
+			break
+		}
+	}
+	is.False(found, "still could find the key we just deleted")
+}
+
+func (is *IntegrationsSuite) Test08RmUser() {
 	leave := os.Getenv("LEAVE_USER")
 	if leave != "" {
 		l, _ := strconv.ParseBool(leave)
