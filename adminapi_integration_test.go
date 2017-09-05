@@ -211,7 +211,7 @@ func (is *IntegrationsSuite) Test07Keys() {
 	generateKey := false
 	kc := &KeyCreateRequest{
 		UID:         is.i.TestUID,
-		Access:      accessKey,
+		AccessKey:   accessKey,
 		SecretKey:   secretKey,
 		GenerateKey: &generateKey,
 	}

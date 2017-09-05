@@ -8,9 +8,9 @@ import (
 type KeyCreateRequest struct {
 	UID         string `url:"uid" validate:"required"`
 	SubUser     string `url:"subuser,omitempty"`
+	AccessKey   string `url:"access-key,omitempty"`
 	SecretKey   string `url:"secret-key,omitempty"`
 	KeyType     string `url:"key-type,omitempty" validate:"omitempty,eq=s3|eq=swift"`
-	Access      string `url:"access,omitempty" validate:"omitempty,eq=read|eq=write|eq=readwrite|eq=full"`
 	GenerateKey *bool  `url:"generate-key,omitempty"` // defaults to true
 }
 
