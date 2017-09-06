@@ -47,5 +47,14 @@
             "secret_key": "smokingmanwasprettyweird"
         }
     ],
-    "caps": []
+    "caps": [],
+    "stats": {
+        "size": 34519712336,
+        "size_actual": 34519736320,
+        "size_utilized": 0,
+        "size_kb": 33710657,
+        "size_kb_actual": 33710680,
+        "size_kb_utilized": 0,
+        "num_objects": 355
+    }
 }

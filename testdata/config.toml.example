@@ -12,3 +12,4 @@
     AdminPath = "admin"
     AccessKeyID = "ABC123BLAHBLAHBLAH"
     SecretAccessKey = "IMASUPERSECRETACCESSKEY"
+    DisableSSL = true
