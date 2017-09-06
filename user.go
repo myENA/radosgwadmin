@@ -33,7 +33,8 @@ type UserModifyRequest struct {
 }
 
 type userInfoRequest struct {
-	UID string `url:"uid" validate:"required"`
+	UID   string `url:"uid" validate:"required"`
+	Stats bool   `url:"stats,omitempty"`
 }
 
 type userDeleteRequest struct {
@@ -49,6 +50,7 @@ type UserCapsRequest struct {
 
 // UserInfoResponse - response from a user info request.
 type UserInfoResponse struct {
+	Tenant      string     `json:"tenant"`
 	UserID      string     `json:"user_id"`
 	DisplayName string     `json:"display_name"`
 	Email       string     `json:"email"`
@@ -58,6 +60,20 @@ type UserInfoResponse struct {
 	Keys        []UserKey  `json:"keys"`
 	SwiftKeys   []SwiftKey `json:"swift_keys"`
 	Caps        []UserCap  `json:"caps"`
+	// Stats is returned if the stats flag is passed to the user info request.
+	Stats *UserStats `json:"stats"`
+}
+
+
+//UserStats - statistics for a user
+type UserStats struct {
+	Size           int `json:"size"`
+	SizeActual     int `json:"size_actual"`
+	SizeUtilized   int `json:"size_utilized"`
+	SizeKB         int `json:"size_kb"`
+	SizeKBActual   int `json:"size_kb_actual"`
+	SizeKBUtilized int `json:"size_kb_utilized"`
+	NumObjects     int `json:"num_objects"`
 }
 
 // SubUser - describes a subuser
@@ -107,9 +123,11 @@ type SubUserRmRequest struct {
 	PurgeKeys *bool  `url:"purge-keys,omitempty"` // Default true
 }
 
-// UserInfo - get user information about uid.
-func (aa *AdminAPI) UserInfo(ctx context.Context, uid string) (*UserInfoResponse, error) {
-	uir := &userInfoRequest{uid}
+// UserInfo - get user information about uid.  If stats is true, then return
+// quota statistics.  This will return a not found error if no statistics
+// are available, even if the user exists.
+func (aa *AdminAPI) UserInfo(ctx context.Context, uid string, stats bool) (*UserInfoResponse, error) {
+	uir := &userInfoRequest{uid, stats}
 	resp := &UserInfoResponse{}
 
 	err := aa.get(ctx, "/user", uir, resp)

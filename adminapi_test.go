@@ -180,6 +180,20 @@ func (ms *ModelsSuite) Test05Quotas() {
 	ms.Equal(resp.UserQuota.MaxSizeKb, int64(-1), "Value not expected")
 }
 
+func (ms *ModelsSuite) Test06User() {
+	userjson := ms.dbags["user"]
+	userstatjson := ms.dbags["userstat"]
+	resp := &UserInfoResponse{}
+	err := json.Unmarshal(userjson, resp)
+	ms.NoError(err, "Error unmarshaling user json")
+	ms.Nil(resp.Stats, "stats not nil as expected")
+	resp = &UserInfoResponse{}
+	err = json.Unmarshal(userstatjson, resp)
+	ms.NoError(err, "Error unmsrshaling userstat json")
+	ms.NotNil(resp.Stats, "userstat Stats is nil when it shouldn't be")
+
+}
+
 func TestAdminAPI(t *testing.T) {
 	suite.Run(t, new(ModelsSuite))
 }
