@@ -87,7 +87,11 @@ func (p *proxy) director(req *http.Request) {
 	req.Host = target.Host
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
 	req.Header.Set("Host", target.Host)
-	_ = awsauth.SignS3(req, p.creds)
+	if p.cfg.Server.UseV4Auth {
+		_ = awsauth.Sign4(req, p.creds)
+	} else {
+		_ = awsauth.SignS3(req, p.creds)
+	}
 	if targetQuery == "" || req.URL.RawQuery == "" {
 		req.URL.RawQuery = targetQuery + req.URL.RawQuery
 	} else {
@@ -123,6 +127,7 @@ type serverConfig struct {
 	ServicePort  int
 	ReadTimeout  rgw.Duration
 	WriteTimeout rgw.Duration
+	UseV4Auth    bool
 }
 
 func init() {

@@ -153,14 +153,6 @@ func (is *IntegrationsSuite) Test05Bucket() {
 		Fix:          true,
 	})
 
-	// see if we can now get stats.
-
-	ui, err := is.aa.UserInfo(context.Background(), is.ic.Integration.TestUID, true)
-
-	is.NoError(err)
-	is.NotNil(ui.Stats)
-
-	is.T().Logf("%#v", ui)
 	bucketnames, err := is.aa.BucketList(context.Background(), "")
 	is.NoError(err, "Got error fetching bucket names")
 	is.T().Logf("bucket names: %#v\n", bucketnames)
@@ -184,6 +176,15 @@ func (is *IntegrationsSuite) Test05Bucket() {
 	bucketindresp, err := is.aa.BucketIndex(context.Background(), bireq)
 	is.NoError(err, "Got error from BucketIndex()")
 	is.T().Logf(spew.Sdump(bucketindresp))
+
+	// see if we can now get stats.
+
+	ui, err := is.aa.UserInfo(context.Background(), is.ic.Integration.TestUID, true)
+
+	is.NoError(err)
+	is.NotNil(ui.Stats)
+
+	is.T().Log(spew.Sdump(ui))
 }
 
 func (is *IntegrationsSuite) Test06Caps() {
@@ -362,9 +363,9 @@ func (is *IntegrationsSuite) writeRandomFile(path string, sizekb int) {
 }
 
 type RandoReader struct {
-	r          *rand.Rand
-	max        int64
-	read       int64
+	r    *rand.Rand
+	max  int64
+	read int64
 }
 
 func NewRandoReader(seed int64, bytes int64) *RandoReader {

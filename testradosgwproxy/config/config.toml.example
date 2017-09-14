@@ -3,6 +3,7 @@
     ServicePort = 8080
     Readtimeout = "120s"
     WriteTimeout = "120s"
+    UseV4Auth = false
 
 [rgw]
     ClientTimeout = "120s"

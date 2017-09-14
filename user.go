@@ -64,7 +64,6 @@ type UserInfoResponse struct {
 	Stats *UserStats `json:"stats"`
 }
 
-
 //UserStats - statistics for a user
 type UserStats struct {
 	Size           int `json:"size"`
