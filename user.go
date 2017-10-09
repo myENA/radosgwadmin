@@ -13,6 +13,7 @@ type UserCreateRequest struct {
 	AccessKey   string    `url:"access-key,omitempty"`
 	SecretKey   string    `url:"secret-key,omitempty"`
 	UserCaps    []UserCap `url:"user-caps,omitempty,semicolon" validate:"omitempty,dive"`
+	Tenant      string    `url:"tenant,omitempty"`
 	GenerateKey *bool     `url:"generate-key,omitempty"` // This defaults to true, preserving that behavior
 	MaxBuckets  int       `url:"max-buckets,omitempty"`
 	Suspended   bool      `url:"suspended,omitempty"`
