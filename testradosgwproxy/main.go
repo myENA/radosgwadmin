@@ -14,6 +14,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	rgw "github.com/myENA/radosgwadmin"
+	"github.com/myENA/restclient"
 	"github.com/smartystreets/go-aws-auth"
 )
 
@@ -125,8 +126,8 @@ type config struct {
 type serverConfig struct {
 	ServiceHost  string
 	ServicePort  int
-	ReadTimeout  rgw.Duration
-	WriteTimeout rgw.Duration
+	ReadTimeout  restclient.Duration
+	WriteTimeout restclient.Duration
 	UseV4Auth    bool
 }
 

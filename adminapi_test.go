@@ -17,6 +17,8 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+var validate *validator.Validate
+
 type ModelsSuite struct {
 	suite.Suite
 	dbags map[string][]byte
@@ -61,6 +63,7 @@ func (ms *ModelsSuite) SetupSuite() {
 	}
 
 	ms.aa = &AdminAPI{}
+	validate = validator.New()
 
 }
 
@@ -102,10 +105,6 @@ func (ms *ModelsSuite) Test01Validators() {
 	_, ok := err.(validator.ValidationErrors)
 	ms.True(ok, "not coerce to ValidationErrors")
 
-	err = ms.aa.validate(ucr)
-	ms.Error(err, "did not fail internal validation")
-	ms.T().Logf("error returned was: %s\n", err)
-
 }
 
 func (ms *ModelsSuite) Test02Usage() {
@@ -133,7 +132,7 @@ func (ms *ModelsSuite) Test03Bucket() {
 
 	bucketindjson := ms.dbags["bucketindex"]
 	bir := &BucketIndexResponse{}
-	err = bir.decode(bytes.NewReader(bucketindjson))
+	err = bir.Decode(bytes.NewReader(bucketindjson))
 	ms.NoError(err, "Error unmarshaling bucket index json")
 	ms.Equal(bir.NewObjects[0], "key.json", "first element of NewObjects not as expected")
 	ms.Equal(len(bir.NewObjects), 3, "length of NewObjects not 3")
@@ -142,7 +141,7 @@ func (ms *ModelsSuite) Test03Bucket() {
 
 	bucketindjsonNoFix := ms.dbags["bucketindex_nofix"]
 	bir = &BucketIndexResponse{}
-	err = bir.decode(bytes.NewReader(bucketindjsonNoFix))
+	err = bir.Decode(bytes.NewReader(bucketindjsonNoFix))
 	ms.NoError(err, "Error, could not read bucketindex_nofix")
 
 	bucketpoljson := ms.dbags["bucketpolicy"]

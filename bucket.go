@@ -59,8 +59,8 @@ type BucketIndexResponse struct {
 	} `json:"headers"`
 }
 
-// Implements the customDecoder interface
-func (bir *BucketIndexResponse) decode(data io.Reader) error {
+// Decode - Implements the restapi.CustomDecoder interface
+func (bir *BucketIndexResponse) Decode(data io.Reader) error {
 	// rgw does some weird shit with this response.
 	// has an array followed by a json object, no delimters.
 	dec := json.NewDecoder(data)

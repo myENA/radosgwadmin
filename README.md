@@ -19,12 +19,15 @@ Example app:
         "time"
 
         rgw "github.com/myENA/radosgwadmin"
+        rcl "github.com/myENA/restclient"
     )
 
     func main() {
 
         cfg := &rgw.Config{
-            ClientTimeout:   rgw.Duration(time.Second * 10),
+            ClientConfig: rcl.ClientConfig{
+                ClientTimeout:   rcl.Duration(time.Second * 10),
+            },
             ServerURL:       "https://my.rgw.org/",
             AdminPath:       "admin",
             AccessKeyID:     "ABC123BLAHBLAHBLAH",
