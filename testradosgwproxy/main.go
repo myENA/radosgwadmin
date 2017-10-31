@@ -51,7 +51,7 @@ func main() {
 		log.Fatalf("Could not initialize admin api: %s", err)
 	}
 
-	p := newProxy(target, cfg, aa.HTTPClient().Transport)
+	p := newProxy(target, cfg, aa.Client.Client.Transport)
 	http.HandleFunc("/", p.proxy.ServeHTTP)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Server.ServiceHost, cfg.Server.ServicePort), nil)
 
