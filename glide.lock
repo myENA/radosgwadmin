@@ -1,5 +1,5 @@
-hash: 70e517437f9b9231ae4fff3cd0e8f075a854ca1c8a173215295f3e7e7f4fc329
-updated: 2017-10-26T16:32:12.063184-05:00
+hash: a55fbfbc30fb2e5d97278884cbe0d06aaea7a0bd0d323b10c1434d76a53911bc
+updated: 2017-10-31T08:42:57.300605-05:00
 imports:
 - name: github.com/BurntSushi/toml
   version: b26d9c308763d68093482582cea63d69be07a0f0
@@ -14,14 +14,16 @@ imports:
   subpackages:
   - query
 - name: github.com/myENA/restclient
-  version: c79be2f23d44c27cdbe2d6f1b071ee724b25e688
+  version: 3404e21dc53c1922845b3358c93e1c1c3c10b2f0
 - name: github.com/smartystreets/go-aws-auth
   version: 8ef1316913ee4f44bc48c2456e44a5c1c68ea53b
+- name: github.com/spkg/bom
+  version: 59b7046e48ad6bac800c5e1dd5142282cbfcf154
 - name: gopkg.in/go-playground/validator.v9
   version: 1304298bf10d085adec514b076772a79c9cadb6b
 testImports:
 - name: github.com/aws/aws-sdk-go
-  version: e9f2a40fef17e4fc6a192dad77ce3b10fcde5caf
+  version: ee1f179877b2daf2aaabf71fa900773bf8842253
   subpackages:
   - aws
   - aws/awserr
@@ -51,7 +53,7 @@ testImports:
   - service/s3/s3manager
   - service/sts
 - name: github.com/davecgh/go-spew
-  version: ecdeabc65495df2dec95d7c4a4c3e021903035e5
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/go-ini/ini
