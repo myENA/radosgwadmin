@@ -1,7 +1,6 @@
 package radosgwadmin
 
 import (
-	"context"
 	"net/http"
 	"net/url"
 	"strings"
@@ -35,8 +34,7 @@ var FalseRef = &falsch
 
 // AdminAPI - admin api struct
 type AdminAPI struct {
-	*restclient.Client
-	u     *url.URL
+	*restclient.BaseClient
 	creds *awsauth.Credentials
 }
 
@@ -46,15 +44,16 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	adminPath := strings.Trim(cfg.AdminPath, "/")
 	aa := &AdminAPI{}
 	var err error
-	aa.u, err = url.Parse(baseURL + "/" + adminPath)
+	u, err := url.Parse(baseURL + "/" + adminPath)
 	if err != nil {
 		return nil, err
 	}
 
-	aa.Client, err = restclient.NewClient(&(cfg.ClientConfig), nil)
+	c, err := restclient.NewClient(&(cfg.ClientConfig), nil)
 	if err != nil {
 		return nil, err
 	}
+	aa.BaseClient = &restclient.BaseClient{Client: c, BaseURL: u}
 	aa.Client.FixupCallback = aa.fixupCallback
 
 	aa.creds = &awsauth.Credentials{
@@ -73,23 +72,6 @@ func NewAdminAPI(cfg *Config) (*AdminAPI, error) {
 	}
 
 	return aa, nil
-}
-
-func (aa *AdminAPI) get(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Client.Get(ctx, aa.u, path, queryStruct, responseBody)
-}
-
-func (aa *AdminAPI) delete(ctx context.Context, path string, queryStruct interface{}, responseBody interface{}) error {
-	return aa.Client.Delete(ctx, aa.u, path, queryStruct, responseBody)
-}
-
-func (aa *AdminAPI) post(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-
-	return aa.Client.Post(ctx, aa.u, path, queryStruct, requestBody, responseBody)
-}
-
-func (aa *AdminAPI) put(ctx context.Context, path string, queryStruct, requestBody interface{}, responseBody interface{}) error {
-	return aa.Put(ctx, aa.u, path, queryStruct, requestBody, responseBody)
 }
 
 // Config - this configures an AdminAPI.

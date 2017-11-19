@@ -164,7 +164,7 @@ func (aa *AdminAPI) BucketList(ctx context.Context, uid string) ([]string, error
 		Stats:  false,
 	}
 	resp := []string{}
-	err := aa.get(ctx, "/bucket", breq, &resp)
+	err := aa.Get(ctx, "/bucket", breq, &resp)
 	return resp, err
 }
 
@@ -180,51 +180,51 @@ func (aa *AdminAPI) BucketStats(ctx context.Context, uid string, bucket string) 
 	if bucket != "" {
 		breq.Bucket = bucket
 		respB := BucketStatsResponse{}
-		err := aa.get(ctx, "/bucket", breq, &respB)
+		err := aa.Get(ctx, "/bucket", breq, &respB)
 		return append(resp, respB), err
 	}
 
 	breq.UID = uid
-	err := aa.get(ctx, "/bucket", breq, &resp)
+	err := aa.Get(ctx, "/bucket", breq, &resp)
 	return resp, err
 }
 
 // BucketIndex - Bucket index operations.  Bucket name required.
 func (aa *AdminAPI) BucketIndex(ctx context.Context, bireq *BucketIndexRequest) (*BucketIndexResponse, error) {
 	resp := &BucketIndexResponse{}
-	err := aa.get(ctx, "/bucket?index", bireq, resp)
+	err := aa.Get(ctx, "/bucket?index", bireq, resp)
 	return resp, err
 }
 
 // BucketRm - remove a bucket.  bucket must be non-empty string.
 func (aa *AdminAPI) BucketRm(ctx context.Context, bucket string, purge bool) error {
 	req := &bucketRmRequest{Bucket: bucket, PurgeObjects: purge}
-	return aa.delete(ctx, "/bucket", req, nil)
+	return aa.Delete(ctx, "/bucket", req, nil)
 }
 
 // BucketUnlink - unlink a bucket from a user.  All parameters required.
 func (aa *AdminAPI) BucketUnlink(ctx context.Context, bucket string, uid string) error {
 	req := &bucketUnlinkRequest{Bucket: bucket, UID: uid}
-	return aa.post(ctx, "/bucket", req, nil, nil)
+	return aa.Post(ctx, "/bucket", req, nil, nil)
 }
 
 // BucketLink - link a bucket to a user, removing any previous links.  All
 // parameters required.
 func (aa *AdminAPI) BucketLink(ctx context.Context, bucket, bucketID, uid string) error {
 	req := &bucketLinkRequest{Bucket: bucket, BucketID: bucketID, UID: uid}
-	return aa.put(ctx, "/bucket", req, nil, nil)
+	return aa.Put(ctx, "/bucket", req, nil, nil)
 }
 
 // BucketObjectRm - remove a bucket.  bucket must be non-empty string.
 func (aa *AdminAPI) BucketObjectRm(ctx context.Context, bucket, object string) error {
 	req := &bucketObjectRmRequest{Bucket: bucket, Object: object}
-	return aa.delete(ctx, "/bucket?object", req, nil)
+	return aa.Delete(ctx, "/bucket?object", req, nil)
 }
 
 // BucketPolicy - get a bucket policy.  bucket required, object is optional.
 func (aa *AdminAPI) BucketPolicy(ctx context.Context, bucket, object string) (*BucketPolicyResponse, error) {
 	req := bucketPolicyRequest{Bucket: bucket, Object: object}
 	resp := &BucketPolicyResponse{}
-	err := aa.get(ctx, "/bucket?policy", req, resp)
+	err := aa.Get(ctx, "/bucket?policy", req, resp)
 	return resp, err
 }
