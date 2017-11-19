@@ -35,7 +35,7 @@ type Quotas struct {
 func (aa *AdminAPI) Quotas(ctx context.Context, uid string) (*Quotas, error) {
 	resp := &Quotas{}
 	req := &quotaGetRequest{UID: uid}
-	err := aa.get(ctx, "/user?quota", req, &resp)
+	err := aa.Get(ctx, "/user?quota", req, &resp)
 	return resp, err
 }
 
@@ -43,7 +43,7 @@ func (aa *AdminAPI) Quotas(ctx context.Context, uid string) (*Quotas, error) {
 func (aa *AdminAPI) QuotaBucket(ctx context.Context, uid string) (*QuotaMeta, error) {
 	resp := &QuotaMeta{}
 	req := &quotaGetRequest{UID: uid, QuotaType: "bucket"}
-	err := aa.get(ctx, "/user?quota", req, &resp)
+	err := aa.Get(ctx, "/user?quota", req, &resp)
 	return resp, err
 }
 
@@ -51,11 +51,11 @@ func (aa *AdminAPI) QuotaBucket(ctx context.Context, uid string) (*QuotaMeta, er
 func (aa *AdminAPI) QuotaUser(ctx context.Context, uid string) (*QuotaMeta, error) {
 	resp := &QuotaMeta{}
 	req := &quotaGetRequest{UID: uid, QuotaType: "user"}
-	err := aa.get(ctx, "/user?quota", req, &resp)
+	err := aa.Get(ctx, "/user?quota", req, &resp)
 	return resp, err
 }
 
 // QuotaSet - Set a quota
 func (aa *AdminAPI) QuotaSet(ctx context.Context, qsr *QuotaSetRequest) error {
-	return aa.put(ctx, "/user?quota", qsr, nil, nil)
+	return aa.Put(ctx, "/user?quota", qsr, nil, nil)
 }

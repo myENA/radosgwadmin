@@ -35,7 +35,7 @@ type KeyRmRequest struct {
 // effect. Additionally, only one swift key may be held by each user or subuser.
 func (aa *AdminAPI) KeyCreate(ctx context.Context, kcr *KeyCreateRequest) ([]UserKey, error) {
 	resp := []UserKey{}
-	err := aa.put(ctx, "/user?key", kcr, nil, &resp)
+	err := aa.Put(ctx, "/user?key", kcr, nil, &resp)
 	return resp, err
 }
 
@@ -43,5 +43,5 @@ func (aa *AdminAPI) KeyCreate(ctx context.Context, kcr *KeyCreateRequest) ([]Use
 //
 // Key type is optional, but required to remove a swift key.
 func (aa *AdminAPI) KeyRm(ctx context.Context, krr *KeyRmRequest) error {
-	return aa.delete(ctx, "/user?key", krr, nil)
+	return aa.Delete(ctx, "/user?key", krr, nil)
 }

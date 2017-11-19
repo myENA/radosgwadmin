@@ -130,47 +130,47 @@ func (aa *AdminAPI) UserInfo(ctx context.Context, uid string, stats bool) (*User
 	uir := &userInfoRequest{uid, stats}
 	resp := &UserInfoResponse{}
 
-	err := aa.get(ctx, "/user", uir, resp)
+	err := aa.Get(ctx, "/user", uir, resp)
 	return resp, err
 }
 
 // UserCreate - create a user described by cur.
 func (aa *AdminAPI) UserCreate(ctx context.Context, cur *UserCreateRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.put(ctx, "/user", cur, nil, resp)
+	err := aa.Put(ctx, "/user", cur, nil, resp)
 	return resp, err
 }
 
 // UserRm - delete user uid
 func (aa *AdminAPI) UserRm(ctx context.Context, uid string, purge bool) error {
 	udr := &userDeleteRequest{uid, purge}
-	return aa.delete(ctx, "/user", udr, nil)
+	return aa.Delete(ctx, "/user", udr, nil)
 }
 
 // UserModify - modify a user described by umr
 func (aa *AdminAPI) UserModify(ctx context.Context, umr *UserModifyRequest) (*UserInfoResponse, error) {
 	resp := &UserInfoResponse{}
-	err := aa.post(ctx, "/user", umr, nil, resp)
+	err := aa.Post(ctx, "/user", umr, nil, resp)
 	return resp, err
 }
 
 // SubUserCreate - create a subuser
 func (aa *AdminAPI) SubUserCreate(ctx context.Context, sucr *SubUserCreateModifyRequest) ([]SubUser, error) {
 	resp := []SubUser{}
-	err := aa.put(ctx, "/user?subuser", sucr, nil, &resp)
+	err := aa.Put(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err
 }
 
 // SubUserModify - modify a subuser
 func (aa *AdminAPI) SubUserModify(ctx context.Context, sucr *SubUserCreateModifyRequest) ([]SubUser, error) {
 	resp := []SubUser{}
-	err := aa.post(ctx, "/user?subuser", sucr, nil, &resp)
+	err := aa.Post(ctx, "/user?subuser", sucr, nil, &resp)
 	return resp, err
 }
 
 // SubUserRm - delete a subuser
 func (aa *AdminAPI) SubUserRm(ctx context.Context, surm *SubUserRmRequest) error {
-	return aa.delete(ctx, "/user?subuser", surm, nil)
+	return aa.Delete(ctx, "/user?subuser", surm, nil)
 }
 
 // CapsAdd - Add capabilities / permissions.  Returns the new effective capabilities.
@@ -183,7 +183,7 @@ func (aa *AdminAPI) SubUserRm(ctx context.Context, surm *SubUserRmRequest) error
 // subtractive.
 func (aa *AdminAPI) CapsAdd(ctx context.Context, ucr *UserCapsRequest) ([]UserCap, error) {
 	resp := []UserCap{}
-	err := aa.put(ctx, "/user?caps", ucr, nil, &resp)
+	err := aa.Put(ctx, "/user?caps", ucr, nil, &resp)
 	return resp, err
 }
 
@@ -191,6 +191,6 @@ func (aa *AdminAPI) CapsAdd(ctx context.Context, ucr *UserCapsRequest) ([]UserCa
 // See notes for CapsAdd().
 func (aa *AdminAPI) CapsRm(ctx context.Context, ucr *UserCapsRequest) ([]UserCap, error) {
 	resp := []UserCap{}
-	err := aa.delete(ctx, "/user?caps", ucr, &resp)
+	err := aa.Delete(ctx, "/user?caps", ucr, &resp)
 	return resp, err
 }

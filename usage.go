@@ -23,7 +23,7 @@ type TrimUsageRequest struct {
 
 // UsageTrim - trim usage data
 func (aa *AdminAPI) UsageTrim(ctx context.Context, treq *TrimUsageRequest) error {
-	err := aa.delete(ctx, "/usage", treq, nil)
+	err := aa.Delete(ctx, "/usage", treq, nil)
 	return err
 }
 
@@ -31,7 +31,7 @@ func (aa *AdminAPI) UsageTrim(ctx context.Context, treq *TrimUsageRequest) error
 func (aa *AdminAPI) Usage(ctx context.Context, ureq *UsageRequest) (*UsageResponse, error) {
 	uresp := new(UsageResponse)
 
-	err := aa.get(ctx, "/usage", ureq, uresp)
+	err := aa.Get(ctx, "/usage", ureq, uresp)
 	return uresp, err
 }
 
