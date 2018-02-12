@@ -136,8 +136,8 @@ func (ms *ModelsSuite) Test03Bucket() {
 	ms.NoError(err, "Error unmarshaling bucket index json")
 	ms.Equal(bir.NewObjects[0], "key.json", "first element of NewObjects not as expected")
 	ms.Equal(len(bir.NewObjects), 3, "length of NewObjects not 3")
-	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWMain.NumObjects, int64(9), "rgwmain num objects not as expected")
-	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWNone.SizeKb, int64(5), "rgwnone num objects not as expected")
+	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWMain.NumObjects, uint64(9), "rgwmain num objects not as expected")
+	ms.Equal(bir.Headers.ExistingHeader.Usage.RGWNone.SizeKb, uint64(5), "rgwnone num objects not as expected")
 
 	bucketindjsonNoFix := ms.dbags["bucketindex_nofix"]
 	bir = &BucketIndexResponse{}

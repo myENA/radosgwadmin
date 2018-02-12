@@ -91,9 +91,9 @@ type BucketUsage struct {
 
 // BucketUsageEntry - entry for each bucket usage bit.
 type BucketUsageEntry struct {
-	SizeKb       int64 `json:"size_kb"`
-	SizeKbActual int64 `json:"size_kb_actual"`
-	NumObjects   int64 `json:"num_objects"`
+	SizeKb       uint64 `json:"size_kb"`
+	SizeKbActual uint64 `json:"size_kb_actual"`
+	NumObjects   uint64 `json:"num_objects"`
 }
 
 // BucketStatsResponse - bucket stats response type
