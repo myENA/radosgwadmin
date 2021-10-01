@@ -85,7 +85,13 @@ func (p *proxy) director(req *http.Request) {
 	targetQuery := target.RawQuery
 	req.URL.Scheme = target.Scheme
 	req.URL.Host = p.target.Host
-	req.Host = target.Host
+	if strings.Contains(req.Host, "localhost") || strings.Contains(req.Host, "127.0.0.1") {
+		// only set Host if they haven't explicitly crafted a Host header using Postman, for V2
+		req.Host = target.Host
+	} else {
+		log.Printf("using provided Host %s", req.Host)
+	}
+
 	req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
 	req.Header.Set("Host", target.Host)
 	if p.cfg.Server.UseV4Auth {
@@ -99,6 +105,10 @@ func (p *proxy) director(req *http.Request) {
 		req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
 	}
 	req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
+	log.Printf("URL: %s", req.URL.String())
+	for k, v := range req.Header {
+		log.Printf("\t%s\t=>\t%#v", k, v)
+	}
 }
 
 func singleJoiningSlash(a, b string) string {
