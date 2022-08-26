@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 var validate *validator.Validate
